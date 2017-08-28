@@ -1,0 +1,38 @@
+Felipe Silva Felix nUSP 8941092
+Lucas Helfstein Rocha nUSP 8802426
+
+Impressao no LCD
+----------------
+
+Imprimimos os dados da seguinte maneira no LCD do robo:
+variacaoX (em cm)
+variacaoY (em cm)
+variacaoTeta (em radianos)
+
+Movimento 1
+-----------
+
+Teoricamente, para uma velocidade de 300 graus/segundo == 5.23 rad/segundo, dado que o raio da roda é 2.8cm, a velocidade em cm é: 14.66cm/segundo. 
+
+Em nosso experimento, o robo andou por 2.5 segundos. Na teoria ele deveria andar 36.6cm. Nos experimentos obtivemos os seguintes resultados:
+pelos cálculos utilizando o tacômetro, 36.7 cm; pela trena, 36cm.
+
+A variação no eixo y foi mínima de 0.07 cm. O esperado seria
+0 cm, o que avaliamos ser um bom resultado.
+
+A variação no ângulo foi de 0.003 radianos. O que também é muito bom.
+
+Movimento 2
+-----------
+
+Para esse movimento, a variaçao no eixo x foi de 37.8cm segundo
+os calculos a partir do tacometro e 39cm segundo mediçao manual a partir
+da trena. A variaçao no eixo y foi de 20.1cm segundo os calculos a partir
+do tacometro e 20cm segundo as mediçoes da trena.
+
+Movimento 3
+-----------
+
+Para esse movimento, cada roda tinha uma velocidade de 300 graus/segundo, cada uma girando para um sentido diferente. Em nosso experimento
+o movimento durou 1,5s. Calculamos a variação angular a partir de uma bússola digital, obtivemos 207 graus de variaçao == 3.611 radianos. 
+Pelos dados do tacômetro obtivemos 3.52 radianos. Uma pequena diferença de 0.9 aproximadamente. As mediçoes espaciais no eixo x e y foram minimas, proximas a 0.
