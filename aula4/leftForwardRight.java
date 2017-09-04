@@ -5,39 +5,47 @@ import lejos.nxt.NXTMotor;
 import lejos.nxt.SensorPort;
 import lejos.nxt.comm.RConsole;
 
-public class CPD {
-	
+// LFR: Left Forward Right 
+
+public class LFR {	
     static LightSensor light;
     static NXTMotor mB;
     static NXTMotor mC;
 	
     public static void main(String args[])  
     {
-	int u_linha, turn, erroant, erro;
-	double KP, KD;
-
 	RConsole.openAny(0);
 	light = new LightSensor(SensorPort.S4);
 	mB = new NXTMotor(MotorPort.B);
 	mC = new NXTMotor(MotorPort.C);
 	Button.waitForAnyPress();
-	
-	u_linha = 50;
-	// KP = 2; Teste para a circular
-	// KD = 1;
-
-	KP = 3.5;
-	KD = 1.0;
-
-	erroant = 0;
-
+		
 	while(!Button.ESCAPE.isDown()){
-	    erro = 45 - light.getLightValue();
-	    turn = (int) (KP*erro + KD*(erroant - erro));
-	    mB.setPower(u_linha + turn);
-	    mC.setPower(u_linha - turn);
-	    RConsole.println(""+light.getLightValue());
-	    erroant = erro;
+		    
+	    while (light.getLightValue () < 40 && !Button.ESCAPE.isDown())
+		{
+		    mB.setPower(60);
+		    mC.setPower(1);
+		    RConsole.println("PRIMEIRO: "+light.getLightValue());
+		}
+
+	    while (light.getLightValue () >=40 && light.getLightValue () < 45 && !Button.ESCAPE.isDown())
+		{
+		    mB.setPower(40);
+		    mC.setPower(40);
+		    RConsole.println("MEIO: "+light.getLightValue());
+
+		}
+
+
+	    while (light.getLightValue () >= 45 && !Button.ESCAPE.isDown())
+		{
+		    mB.setPower(1);
+		    mC.setPower(60);
+		    RConsole.println("ULTIMO: "+light.getLightValue());
+		}
+
+
 	}
 
 

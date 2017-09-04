@@ -21,8 +21,8 @@ public class CP {
 	mC = new NXTMotor(MotorPort.C);
 	Button.waitForAnyPress();
 	
-	u_linha = 80;
-	KP = 3;
+	u_linha = 50;
+	KP = 5;
 
 	while(!Button.ESCAPE.isDown()){
 	    erro = 45 - light.getLightValue();

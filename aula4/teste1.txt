@@ -1,4 +1,0 @@
-Found NXT: NXT15 001653150C10
-Connected to NXT15 001653150C10
-Console open
-Got exception during close: java.io.IOException: Error in write

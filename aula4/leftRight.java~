@@ -5,8 +5,7 @@ import lejos.nxt.NXTMotor;
 import lejos.nxt.SensorPort;
 import lejos.nxt.comm.RConsole;
 
-// CP: controleProporcional
-public class CP {
+public class controleProporcional {
 	
     static LightSensor light;
     static NXTMotor mB;
@@ -22,7 +21,7 @@ public class CP {
 	Button.waitForAnyPress();
 	
 	u_linha = 80;
-	KP = 3;
+	KP = 243;
 
 	while(!Button.ESCAPE.isDown()){
 	    erro = 45 - light.getLightValue();
@@ -31,6 +30,18 @@ public class CP {
 	    mC.setPower(u_linha - turn);
 	    RConsole.println(""+light.getLightValue());
 	}
+
+
+	// while (light.getLightValue() < 50){
+		    
+	//     // mB.setPower(50);
+	//     // mC.setPower(50);
+		    
+	//     //mB.setPower(-50);
+	//     //mC.setPower(-50);
+	// }
+	// mB.stop();
+	// mC.stop();
     }	
 }
 
