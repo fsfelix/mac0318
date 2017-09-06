@@ -85,10 +85,10 @@ public class Atividade1 {
 
     public static void main(String[] args) {
 	// Escolha o tipo de movimento descomentando alguma linha.
-
-	// Movimento1(2500);
+    Movimento3(100);
+	Movimento1(2500);
 	// Movimento2(2500);
-	Movimento3(1500);
+	//Movimento3(1500);
 	newPos(0,0,0);
     } 
 
