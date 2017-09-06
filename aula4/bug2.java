@@ -18,12 +18,19 @@ public class bug2 {
     static NXTRegulatedMotor rc; 
     
     public static double normalizeAngle(double a, double center) {
-	return a - (2 * Math.PI) * Math.floor((a + Math.PI - center) / (2*Math.PI));
+		return a - (2 * Math.PI) * Math.floor((a + Math.PI - center) / (2*Math.PI));
     }
 
-    private static double [] newPos(double x0, double y0, double teta0) {
+    private static double [] newPos(double [] lastPos) {
+    	
+    	double teta0, x0, y0;
+
+    	x0 = lastPos[0];
+    	y0 = lastPos[1];
+    	teta0 = lastPos[2];
+
     	double xf, yf, tetaf, delta_teta, delta_s, raioDaRoda, tachoB, tachoC, sum;
-	double [] pos = new double[3];
+		double [] pos = new double[3];
 
     	raioDaRoda = 2.8;
 	
@@ -37,8 +44,8 @@ public class bug2 {
     	// 11.2 é a distancia entre eixos
     	delta_teta = (tachoB - tachoC)*(raioDaRoda)/(11.2);
 	
-	sum = teta0 + delta_teta/2;
-	sum = normalizeAngle(sum, Math.PI);	
+		sum = teta0 + delta_teta/2;
+		sum = normalizeAngle(sum, Math.PI);	
 
     	delta_s = (tachoB + tachoC)*raioDaRoda/2;
     	// xf = x0 + delta_s*Math.cos(teta0 + delta_teta/2);
@@ -47,164 +54,229 @@ public class bug2 {
     	yf = y0 + delta_s*Math.sin(sum);
 
     	tetaf = teta0 + delta_teta;
-	tetaf = normalizeAngle(tetaf, Math.PI);	
+		tetaf = normalizeAngle(tetaf, Math.PI);	
 
-	pos[0] = xf;
-	pos[1] = yf;
-	pos[2] = tetaf;
+		pos[0] = xf;
+		pos[1] = yf;
+		pos[2] = tetaf;
 
-	return pos;
+		return pos;
     }
 
-    private static boolean isOnLine (){
+    private static double [] supremeNewPos(double [] lastPos, double lastDelta) {
+    	
+    	double teta0, x0, y0;
+
+    	x0 = lastPos[0];
+    	y0 = lastPos[1];
+    	teta0 = lastPos[2];
+
+    	double xf, yf, tetaf, delta_teta, delta_s, raioDaRoda, tachoB, tachoC, sum;
+		double [] pos = new double[3];
+
+		raioDaRoda = 2.8;
+    	teta0 = Math.toRadians(teta0);
+    	tachoB = rb.getTachoCount();
+    	tachoC = rc.getTachoCount();
+	
+    	tachoB = Math.toRadians(tachoB);
+    	tachoC = Math.toRadians(tachoC);
+	
+    	// 11.2 é a distancia entre eixos
+    	delta_teta = (tachoB - tachoC) * (raioDaRoda) / (11.2);
+	
+		sum = teta0 + delta_teta / 2;
+		sum = normalizeAngle(sum, Math.PI);	
+
+    	delta_s = (tachoB + tachoC) * raioDaRoda/2;
+    	delta_s = delta_s - lastDelta;
+
+    	xf = x0 + delta_s * Math.cos(sum);
+    	yf = y0 + delta_s * Math.sin(sum);
+
+    	tetaf = teta0 + delta_teta;
+		tetaf = normalizeAngle(tetaf, Math.PI);	
+
+		pos[0] = xf;
+		pos[1] = yf;
+		pos[2] = tetaf;
+
+		lastDelta = (tachoB + tachoC) * raioDaRoda / 2;
+
+		return pos;
+    }
+
+    private static boolean isOnLine (double [] lastPos){
     	
     	double eps = 5;
     	double diff;
-    	double [] pos = newPos(0, 0, 37);
-	
-	// RConsole.println("x: "+pos[0]);
-	// RConsole.println("y: "+pos[1]);
-	// RConsole.println("teta: "+pos[2]);
+    	double [] pos = newPos(lastPos);
 	
     	diff = Math.abs(pos[1] - pos[0] * 0.77);
-	// RConsole.println("diff: " + diff); 
+    
     	if (diff < eps)
-	    return true;
+		    return true;
     	else 
-	    return false;
+	    	return false;
     }
 
+    private static double updateDelta() {
 
-    public static void main(String args[])  
-    {
-	int u_linha, turn, erroant, erro;
-	double KP, KD, light_v;
-	boolean boolb, boolc;
-	boolean FINISHED = false;
-	double [] pos = new double[3];
+    	double delta_teta, tachoB, tachoC;
+    	double raioDaRoda = 2.8;
+	
+    	tachoB = rb.getTachoCount();
+    	tachoC = rc.getTachoCount();
+	
+    	tachoB = Math.toRadians(tachoB);
+    	tachoC = Math.toRadians(tachoC);
+
+		delta_teta = (tachoB - tachoC)*(raioDaRoda)/(11.2);
+
+		return delta_teta;
+    }
+
+    private static void printPos(double [] myPos){
+		RConsole.println(" ");
+		RConsole.println(" ");
+		RConsole.println(" ");
+		RConsole.println("x: "+ myPos[0]);
+		RConsole.println("y: "+ myPos[1]);
+		RConsole.println("teta: "+ myPos[2]);
+		RConsole.println(" "+ myPos[2]);
+		RConsole.println(" ");
+		RConsole.println(" ");
+		RConsole.println(" ");
+    }
+
+    public static void main(String args[]) {
 		
-	RConsole.openAny(0);
-	light = new LightSensor(SensorPort.S4);
-	mB = new NXTMotor(MotorPort.B);
-	mC = new NXTMotor(MotorPort.C);
+		int u_linha, turn, erroant, erro;
+		double KP, KD, light_v, actualDelta;
+		boolean boolb, boolc;
+		boolean FINISHED = false;
 
-	rb = new NXTRegulatedMotor(MotorPort.B);
-	rc = new NXTRegulatedMotor(MotorPort.C);
+		double [] pos = new double[3];
+		double [] actualPos = new double[3];
 
-	Button.waitForAnyPress();
+		RConsole.openAny(0);
 
-	rb.rotate(260, true);
-	rc.rotate(-260);
-	rb.resetTachoCount();
-	rc.resetTachoCount();
+		light = new LightSensor(SensorPort.S4);
+		mB = new NXTMotor(MotorPort.B);
+		mC = new NXTMotor(MotorPort.C);
+		rb = new NXTRegulatedMotor(MotorPort.B);
+		rc = new NXTRegulatedMotor(MotorPort.C);
 
-	pos[0] = 0;
-	pos[1] = 0;
-	pos[2] = 0;
+		Button.waitForAnyPress();
 
-	u_linha = 40; 	// 50
-	KP = 6; 		// 6
-	KD = 3; 		// 3
-
-	erroant = 0;
+		rb.rotate(260, true);
+		rc.rotate(-260);
 		
-	rb.setSpeed(400);
-	rc.setSpeed(400);
-	light_v = 0;
+		rb.resetTachoCount();
+		rc.resetTachoCount();
 
-	while (!FINISHED)
-	    { 
-		// regulated
-		rb.forward();
-		rc.forward();
+		u_linha = 40; 	// 50
+		KP = 6; 		// 6
+		KD = 3; 		// 3
+
+		erroant = 0;
+		light_v = 0;
 			
-		light_v = light.getLightValue();
+		rb.setSpeed(200);
+		rc.setSpeed(200);
+		
+		// position 
+		actualPos[0] = 0;
+		actualPos[1] = 0;
+		actualPos[2] = 37;
+		actualDelta = 0.0;
 
-		// black
-		if (light_v < 40)
-		    {
-			rb.stop(true);
-			rc.stop();
-			// // regulated to unregulated
-			boolb = rb.suspendRegulation(); 
-			boolc = rc.suspendRegulation();
+		while (!FINISHED) { 
 
-			// // should it turn right or left ?? 
-			// // follow the thin black line...
+			// regulated
+			rb.forward();
+			rc.forward();
+			
+			// get light
+			light_v = light.getLightValue();
+
+			// black
+			if (light_v < 40) {
+
+				rb.stop(true);
+				rc.stop();
+
+				// first black position
+				actualDelta = updateDelta();
+				actualPos = supremeNewPos(actualPos, actualDelta);
+
+				printPos(actualPos);
+
+				// turn to some side
+				rb.rotateTo(180, true);
+				rc.rotate(-180);
+
+				// go forward and stop
+				rb.forward();
+				rc.forward();
+				Delay.msDelay(5000);
+				rb.stop(true);
+				rc.stop();
+
+				// change from regulated to unregulated
+				boolb = rb.suspendRegulation(); 
+				boolc = rc.suspendRegulation();
+
+				//		 first black position
+				actualDelta = updateDelta();
+				actualPos = supremeNewPos(actualPos, actualDelta);
+
+				printPos(actualPos);
+
+				FINISHED = true;
+
+				// follow the thin black line using unregulated: CPD
+				// while(!Button.ESCAPE.isDown()) {
 				
-			// // follow the thin black line using unregulated: CPD
-			while(!Button.ESCAPE.isDown())
-			    {
-				erro = 45 - light.getLightValue();
-				turn = (int) (KP*erro + KD*(erroant - erro));
-				mB.setPower(u_linha + turn);
-				mC.setPower(u_linha - turn);
-				
-				if (isOnLine())
-				    {
-					RConsole.println("Tamo na linha!");
-					pos = newPos(0, 0, 37);
-					RConsole.println("x: "+pos[0]);
-					RConsole.println("y: "+pos[1]);
-					RConsole.println("teta: "+pos[2]);
+				// 	erro = 45 - light.getLightValue();
+				// 	turn = (int) (KP * erro + KD * (erroant - erro));
+				// 	mB.setPower(u_linha + turn);
+				// 	mC.setPower(u_linha - turn);
 
-				    }
-				
-			    }
+				// 	// if (isOnLine(actualPos)) {
+				// 	// 	RConsole.println("Tamo na linha!");
+				// 	//	pos = newPos(pos);				
+				// 	// 	actualDelta = updateDelta();
+				// 	// 	actualPos = supremeNewPos(actualPos, actualDelta);
+				// 	// }	
 
-			// 	/* Helfs, tem que ver se ele voltou pra linha, ai ele vai reto. só que 
-			// 	quando roda a primeira vez ele não pode chegar esse if. mas provavelmente ele ira
-			// 	pq ainda não entrou muito na curva. entao temos que ter um timer pra liberar 
-			// 	a entrada nesse if. */
+				// 	//  pos = updatePos(pos);
 
-			// 	RConsole.println("x: "+pos[0]);
-			// 	RConsole.println("y: "+pos[1]);
-			// 	RConsole.println("teta: "+pos[2]);
-			// 	RConsole.println("light: "+light_v);		
-			// 	RConsole.println("");
-			// 	erroant = erro;
+		  //  			// Delay.msDelay(200);
+				// 	// actualDelta = updateDelta();
+				// 	// actualPos = supremeNewPos(actualPos, actualDelta);
+				// 	// printPos(actualPos);
+
+				// 	erroant = erro;
+			 //    }				
 		    }
 
-		// if (isOnLine()){
-		//     RConsole.println("Tamo na linha!");
-		// }
+			// if (isOnLine()){
+			//     RConsole.println("Tamo na linha!");
+			// }
 
-		// else {
-		//     RConsole.println("Não estamos!");
-		// }
+			// else {
+			//     RConsole.println("Não estamos!");
+			// }
 
-		// if (Button.ESCAPE.isDown())
-		//     {
-		// 	FINISHED = true;
-			
-		//     }
-		//}
+			// if (Button.ESCAPE.isDown())
+			//     {
+			// 	FINISHED = true;
+				
+			//     }
+			//}
 
-	    }
-	pos = newPos(0, 0, 37);
-	RConsole.println("x: "+pos[0]);
-	RConsole.println("y: "+pos[1]);
-	RConsole.println("teta: "+pos[2]);
-		
-	// while(!Button.ESCAPE.isDown()){
-	//     erro = 45 - light.getLightValue();
-	//     turn = (int) (KP*erro + KD*(erroant - erro));
-	//     mB.setPower(u_linha + turn);
-	//     mC.setPower(u_linha - turn);
-	//     RConsole.println(""+light.getLightValue());
-	//     erroant = erro;
-	// }
-
-	// while (light.getLightValue() < 50){
-		    
-	//     // mB.setPower(50);
-	//     // mC.setPower(50);
-		    
-	//     //mB.setPower(-50);
-	//     //mC.setPower(-50);
-	// }
-	// mB.stop();
-	// mC.stop();
+	    }		
     }	
 }
 
