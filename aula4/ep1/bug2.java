@@ -10,11 +10,11 @@ import lejos.util.Delay;
 
 public class bug2 {
 
-    static light  = new LightSensor(SensorPort.S4);
-    static mB 		= new NXTMotor(MotorPort.B);
-    static mC 		= new NXTMotor(MotorPort.C);
-    static rb 		= new NXTRegulatedMotor(MotorPort.B);
-    static rc 		= new NXTRegulatedMotor(MotorPort.C);
+    static LightSensor light  = new LightSensor(SensorPort.S4);
+    static NXTMotor mB	      = new NXTMotor(MotorPort.B);
+    static NXTMotor mC	      = new NXTMotor(MotorPort.C);
+    static NXTRegulatedMotor rb	= new NXTRegulatedMotor(MotorPort.B);
+    static NXTRegulatedMotor rc = new NXTRegulatedMotor(MotorPort.C);
 
     public static void unregulatedCPD() {
 
@@ -40,13 +40,17 @@ public class bug2 {
 
     public static boolean isOnLine (Position pos) {
 
-        double eps = 5;
+        double eps = 2;
         double diff;
 
         diff = Math.abs(pos.y - pos.x * 0.77); // verifica se pertence a reta
 
-        if (diff < eps)
+        if (diff < eps) {
+	    printPos(pos);
+	    RConsole.println("LINHA");
+
             return true;
+	}
         else
             return false;
     }
@@ -72,11 +76,20 @@ public class bug2 {
         // double delta_tachoB, delta_tachoC;
         // double delta_teta, delta_s, tachoB, tachoC;
 
-        mB.setPower(0);
-        mC.setPower(15);
+	
+	if (mB.getTachoCount () < mC.getTachoCount()) {
+	    mB.setPower(40);
+	    mC.setPower(0);
+	}
+	else {
+	    mC.setPower(40);
+	    mB.setPower(0);
+	
+	}
 
 
         while(mB.getTachoCount() != mC.getTachoCount()) {
+	    RConsole.println("RODANDO ");
 
         }
 
@@ -91,28 +104,35 @@ public class bug2 {
         double KP, KD;
         boolean stop = false;
         long start_t;
-        Position pos_f = new Position(pos_0.x, pos_0.y, pos_0.teta);
+        Position pos_f = new Position(pos_0.x, pos_0.y, pos_0.teta, pos_0.tacho[0], pos_0.tacho[1]);
 
         erro 		  = 0;
-        erroant 	= 0;
-        u_linha 	= 40; 	// 50
-        KP 			  = 6;	// 6
-        KD 			  = 3;	// 3
+        erroant 	  = 0;
+        u_linha 	  = 30; 	// 50
+        KP 			  = 2;	// 6
+        KD 			  = 1.5;	// 3
         start_t   = System.currentTimeMillis();
 
         while (!stop) {
 
-            erro = 45 - light.getLightValue();
-            turn = (int) (KP * erro + KD * (erroant - erro));
+            erro = 50 - light.getLightValue();
+            turn = (int) (KP * erro + KD * (erroant - erro)/20.0);
             mB.setPower(u_linha + turn);
             mC.setPower(u_linha - turn);
             erroant = erro;
 
-            pos_f.updatePosition(rb, rc);
+	    Delay.msDelay(20);
+	    pos_f.updatePosition(rb, rc);
+	    // printPos(pos_f);
+
+	    // if ((System.currentTimeMillis() - start_t) % 20 == 0) {
+	    // 	pos_f.updatePosition(rb, rc);
+	    // 	printPos(pos_f);
+	    // }
 
             if (isOnLine(pos_f) && isCloserToG(pos_0, pos_f) && (System.currentTimeMillis() - start_t > 5000)) {
                 stop = true;
-                pose_0 = pos_f;
+                pos_0 = new Position (pos_f.x, pos_f.y, pos_f.teta, pos_f.tacho[0], pos_f.tacho[1]);
             }
 
         }
@@ -146,7 +166,34 @@ public class bug2 {
         // go forward and stop after 5 seconds
         rb.forward();
         rc.forward();
-        Delay.msDelay(5000);
+
+        Delay.msDelay(3000);
+        rb.stop(true);
+        rc.stop();
+
+        pos.updatePosition(rb, rc);
+        printPos(pos);
+
+        rb.setSpeed(300);
+        rc.setSpeed(0);
+
+        rb.forward();
+        rc.forward();
+
+        Delay.msDelay(1000);
+        rb.stop(true);
+        rc.stop();
+
+        pos.updatePosition(rb, rc);
+        printPos(pos);
+
+        rb.setSpeed(3000);
+        rc.setSpeed(3000);
+	
+	rb.forward();
+        rc.forward();
+
+        Delay.msDelay(100);
         rb.stop(true);
         rc.stop();
 
@@ -173,9 +220,21 @@ public class bug2 {
         rb.setSpeed(200);
         rc.setSpeed(200);
 
-        // set initial position
-        Position pose = new Position(0, 0, 37);
+        // rb.setSpeed(0);
+        // rc.setSpeed(0);
 
+        // set initial position
+        Position pose = new Position(0, 0, 0.66, 0, 0);
+	
+	// rb.flt();
+	// rc.flt();
+	
+	// while (true) {
+	//     pose.updatePosition(rb, rc);
+	//     System.out.println("x: " + Math.round(pose.x));
+	//     System.out.println("y: " + Math.round(pose.y)); 	    
+	//     System.out.println("teta: " + Math.round(pose.teta));
+	// }
         while (!FINISHED) {
 
             // regulated
@@ -184,10 +243,11 @@ public class bug2 {
 
             // black
             if (light.getLightValue() < 40) {
-                pose.updatePosition(rb, rc);
-
                 rb.stop(true);
                 rc.stop();
+
+                pose.updatePosition(rb, rc);
+		printPos(pose);
 
                 boolb = rb.suspendRegulation();
                 boolc = rc.suspendRegulation();
@@ -196,7 +256,13 @@ public class bug2 {
                 fixHeading(pose);
             }
 
+	}
 
-        }
+	// locationTester(pose);
+	// boolb = rb.suspendRegulation();
+	// boolc = rc.suspendRegulation();
+	// fixHeading(pose);
+        // pose.updatePosition(rb, rc);
+	// printPos(pose);
     }
 }

@@ -5,16 +5,18 @@ public class Position {
     public double x                 = 0.0;
     public double y                 = 0.0;
     public double teta              = 0.0;
-    public Integer[] tacho          = {0, 0};
+    public Double[] tacho           = {0.0, 0.0};
     public double accum_delta_s     = 0.0;
     public double raioDaRoda        = 2.8;
     public double dist_entre_eixos  = 11.2;
 
     // construtor (x, y, pose). pose em graus.
-    public Position (int a, int b, double c) {
+    public Position (double a, double b, double c, double d, double e) {
         x = a;
         y = b;
         teta = c;
+	tacho[0] = d;
+	tacho[1] = e;
     }
 
     // normalizadora de angulos
@@ -41,7 +43,6 @@ public class Position {
         // tudo em radianos
         tachoB = Math.toRadians(tachoB);
         tachoC = Math.toRadians(tachoC);
-        teta0  = Math.toRadians(teta0);
 
         delta_tachoB = tachoB - this.tacho[0];
         delta_tachoC = tachoC - this.tacho[1];
@@ -57,13 +58,13 @@ public class Position {
         // nova posicao, considerando apenas o delta_s do ultimo movimento
         xf = x0 + delta_s * Math.cos(teta0 + delta_teta / 2);
         yf = y0 + delta_s * Math.sin(teta0 + delta_teta / 2);
-
+	
         tetaf = teta0 + delta_teta;
 
         // atualizar posição
         this.x = xf;
         this.y = yf;
-        this.teta = tetaf;
+        this.teta = normalizeAngle(tetaf, Math.PI);
 
         this.tacho[0] = tachoB;
         this.tacho[1] = tachoC;
