@@ -38,7 +38,7 @@ public class bug2 {
         }
     }
 
-    public boolean isOnLine (Position pos) {
+    public static boolean isOnLine (Position pos) {
 
         double eps = 5;
         double diff;
@@ -51,11 +51,16 @@ public class bug2 {
             return false;
     }
 
+    public static isCloserToG(Position pos_0, Position pos_f) {
+        return pos_f.x > pos_0.x;
+    }
+
     public static void line_CPD (Position pos_0) {
 
         int u_linha, turn, erro, erroant;
         double KP, KD;
         boolean stop = false;
+        long start_t;
         Position pos_f = new Position(pos_0.x, pos_0.y, pos_0.teta);
 
         erro 		  = 0;
@@ -63,6 +68,7 @@ public class bug2 {
         u_linha 	= 40; 	// 50
         KP 			  = 6;	// 6
         KD 			  = 3;	// 3
+        start_t   = System.currentTimeMillis();
 
         while (!stop) {
 
@@ -74,7 +80,7 @@ public class bug2 {
 
             pos_f.updatePosition(rb, rc);
 
-            if (isOnLine(pos_f) && isCloserToG(pos_0, pos_f)) {
+            if (isOnLine(pos_f) && isCloserToG(pos_0, pos_f) && (System.currentTimeMillis() - start_t > 5000)) {
                 stop = true;
             }
 
@@ -122,7 +128,6 @@ public class bug2 {
 
         boolean boolb, boolc;
         boolean FINISHED = false;
-
 
         RConsole.openAny(0);
         Button.waitForAnyPress();
