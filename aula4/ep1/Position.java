@@ -15,13 +15,50 @@ public class Position {
         x = a;
         y = b;
         teta = c;
-	tacho[0] = d;
-	tacho[1] = e;
+    	tacho[0] = d;
+    	tacho[1] = e;
     }
 
     // normalizadora de angulos
     public static double normalizeAngle(double a, double center) {
         return a - (2 * Math.PI) * Math.floor((a + Math.PI - center) / (2 * Math.PI));
+    }
+
+    public void updateTeta(NXTRegulatedMotor rb, NXTRegulatedMotor rc) {
+
+        //usado apenas quando termina de arrumar o heading
+
+        double x0, y0, xf, yf, teta0, tetaf;
+        double delta_teta, delta_s, tachoB, tachoC;
+        double delta_tachoB, delta_tachoC;
+
+        // posicao atual
+        x0 = this.x;
+        y0 = this.y;
+        teta0 = this.teta;
+
+        // obter os tacometros que indicam todo o delta_s
+        tachoB = rb.getTachoCount();
+        tachoC = rc.getTachoCount();
+
+        // tudo em radianos
+        tachoB = Math.toRadians(tachoB);
+        tachoC = Math.toRadians(tachoC);
+
+        delta_tachoB = tachoB - this.tacho[0];
+        delta_tachoC = tachoC - this.tacho[1];
+
+        // angulo = pose
+        delta_teta = (delta_tachoB - delta_tachoC) * (raioDaRoda) / dist_entre_eixos;
+	
+        tetaf = teta0 + delta_teta;
+
+        // atualizar posição
+        this.teta = normalizeAngle(tetaf, Math.PI);
+
+        this.tacho[0] = tachoB;
+        this.tacho[1] = tachoC;
+
     }
 
     // atualizar posicao, passando motores como parametro
