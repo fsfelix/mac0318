@@ -51,19 +51,38 @@ public class bug2 {
             return false;
     }
 
-    public static isCloserToG(Position pos_0, Position pos_f) {
+    public static boolean isCloserToG(Position pos_0, Position pos_f) {
         return pos_f.x > pos_0.x;
     }
 
-    public static distanceToLine(Position pos) {
+    public static double distanceToLine(Position pos) {
         // para estimar quantas verificações devem ser feitas
         double dist = Math.abs((0.77 * pos.x) + (-1.0 * pos.y)) / Math.sqrt((0.77 * 0.77) + 1);
         return dist;
     }
 
-    public static euclideanDistance(Position pos1, Position pos2) {
+    public static double euclideanDistance(Position pos1, Position pos2) {
         // talvez seja util
         return Math.sqrt(Math.pow((pos1.x - pos2.x), 2) + Math.pow((pos1.y - pos2.y), 2));
+    }
+
+    public static void fixHeading(Position pose) {
+        // boolean stop = false;
+        // double  angle = 0.66;
+        // double delta_tachoB, delta_tachoC;
+        // double delta_teta, delta_s, tachoB, tachoC;
+
+        mB.setPower(0);
+        mC.setPower(15);
+
+
+        while(mB.getTachoCount() != mC.getTachoCount()) {
+
+        }
+
+        mB.setPower(0);
+        mC.setPower(0);
+
     }
 
     public static void line_CPD (Position pos_0) {
@@ -93,6 +112,7 @@ public class bug2 {
 
             if (isOnLine(pos_f) && isCloserToG(pos_0, pos_f) && (System.currentTimeMillis() - start_t > 5000)) {
                 stop = true;
+                pose_0 = pos_f;
             }
 
         }
@@ -173,7 +193,7 @@ public class bug2 {
                 boolc = rc.suspendRegulation();
 
                 line_CPD(pose);
-
+                fixHeading(pose);
             }
 
 
