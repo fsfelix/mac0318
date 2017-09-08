@@ -55,6 +55,17 @@ public class bug2 {
         return pos_f.x > pos_0.x;
     }
 
+    public static distanceToLine(Position pos) {
+        // para estimar quantas verificações devem ser feitas
+        double dist = Math.abs((0.77 * pos.x) + (-1.0 * pos.y)) / Math.sqrt((0.77 * 0.77) + 1);
+        return dist;
+    }
+
+    public static euclideanDistance(Position pos1, Position pos2) {
+        // talvez seja util
+        return Math.sqrt(Math.pow((pos1.x - pos2.x), 2) + Math.pow((pos1.y - pos2.y), 2));
+    }
+
     public static void line_CPD (Position pos_0) {
 
         int u_linha, turn, erro, erroant;
