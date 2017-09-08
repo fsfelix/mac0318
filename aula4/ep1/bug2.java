@@ -10,12 +10,11 @@ import lejos.util.Delay;
 
 public class bug2 {
 
-    static LightSensor light;
-    static NXTMotor mB;
-    static NXTMotor mC;
-
-    static NXTRegulatedMotor rb;
-    static NXTRegulatedMotor rc;
+    static light  = new LightSensor(SensorPort.S4);
+    static mB 		= new NXTMotor(MotorPort.B);
+    static mC 		= new NXTMotor(MotorPort.C);
+    static rb 		= new NXTRegulatedMotor(MotorPort.B);
+    static rc 		= new NXTRegulatedMotor(MotorPort.C);
 
     public static void unregulatedCPD() {
 
@@ -37,6 +36,50 @@ public class bug2 {
             mC.setPower(u_linha - turn);
             erroant = erro;
         }
+    }
+
+    public boolean isOnLine (Position pos) {
+
+        double eps = 5;
+        double diff;
+
+        diff = Math.abs(pos.y - pos.x * 0.77); // verifica se pertence a reta
+
+        if (diff < eps)
+            return true;
+        else
+            return false;
+    }
+
+    public static void line_CPD (Position pos_0) {
+
+        int u_linha, turn, erro, erroant;
+        double KP, KD;
+        boolean stop = false;
+        Position pos_f = new Position(pos_0.x, pos_0.y, pos_0.teta);
+
+        erro 		  = 0;
+        erroant 	= 0;
+        u_linha 	= 40; 	// 50
+        KP 			  = 6;	// 6
+        KD 			  = 3;	// 3
+
+        while (!stop) {
+
+            erro = 45 - light.getLightValue();
+            turn = (int) (KP * erro + KD * (erroant - erro));
+            mB.setPower(u_linha + turn);
+            mC.setPower(u_linha - turn);
+            erroant = erro;
+
+            pos_f.updatePosition(rb, rc);
+
+            if (isOnLine(pos_f) && isCloserToG(pos_0, pos_f)) {
+                stop = true;
+            }
+
+        }
+
     }
 
     private static void printPos(Position pos) {
@@ -77,15 +120,9 @@ public class bug2 {
 
     public static void main(String args[]) {
 
-        double light_v;
         boolean boolb, boolc;
         boolean FINISHED = false;
 
-        light 	= new LightSensor(SensorPort.S4);
-        mB 		= new NXTMotor(MotorPort.B);
-        mC 		= new NXTMotor(MotorPort.C);
-        rb 		= new NXTRegulatedMotor(MotorPort.B);
-        rc 		= new NXTRegulatedMotor(MotorPort.C);
 
         RConsole.openAny(0);
         Button.waitForAnyPress();
@@ -97,12 +134,11 @@ public class bug2 {
         rb.resetTachoCount();
         rc.resetTachoCount();
 
-        light_v = 0;
         rb.setSpeed(200);
         rc.setSpeed(200);
 
         // set initial position
-        Position ponto = new Position(0, 0, 37);
+        Position pose = new Position(0, 0, 37);
 
         while (!FINISHED) {
 
@@ -110,21 +146,21 @@ public class bug2 {
             rb.forward();
             rc.forward();
 
-            // get light
-            light_v = light.getLightValue();
-
             // black
-            if (light_v < 40) {
+            if (light.getLightValue() < 40) {
+                pose.updatePosition(rb, rc);
 
-                // change from regulated to unregulated
                 rb.stop(true);
                 rc.stop();
 
                 boolb = rb.suspendRegulation();
                 boolc = rc.suspendRegulation();
 
-                unregulatedCPD();
+                line_CPD(pose);
+
             }
+
+
         }
     }
 }
