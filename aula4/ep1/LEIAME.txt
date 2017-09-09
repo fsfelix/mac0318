@@ -1,0 +1,7 @@
+O arquivo common output tem o resultado daquele teste comum que fizemos durante a maior parte do dia.
+
+O arquivo output_reverse é quando o robo começava na outra ponta do trajeto. Esse output não faz muito sentido quando é plotado no mapa que disponibilizaram no paca.
+
+Os outros outputs_reverse são só mais instâncias e tem um outro arquivo onde as coisas deram bem errado, é legal avaliar ele no mapa e ver o que acontecia com o robô.
+
+
