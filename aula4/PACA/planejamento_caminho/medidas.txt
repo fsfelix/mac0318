@@ -1,0 +1,16 @@
+Alunos
+------
+
+Felipe Silva Felix - 8941092
+Lucas Helfstein Rocha - 8802426
+
+Medidas
+-------
+
+1) 3cm longe do alvo
+2) 0cm longe do alvo
+3) 6cm longe do alvo
+4) 9cm longe do alvo
+5) 10cm longe do alvo
+
+Média: 5,6 cm

@@ -1,0 +1,15 @@
+
+Alunos
+------
+
+Felipe Silva Felix - 8941092
+Lucas Helfstein Rocha - 8802426
+
+Instruções
+----------
+
+Segue um pequeno script para compilar os arquivos.
+Para utilizar: ./runner NomeDoArquivoJava  (sem '.java')
+
+Obs: alguns programas esperam o nxjconsole ser aberto para
+rodar.
