@@ -9,10 +9,10 @@ import lejos.robotics.localization.OdometryPoseProvider;
 import lejos.robotics.navigation.Pose;
 
 public class SlaveNav {
-	private static final byte ADD_POINT = 0; //adds waypoint to path
-	private static final byte TRAVEL_PATH = 1; // enables slave to execute the path
-	private static final byte STATUS = 2; // enquires about slave's position 
-	private static final byte STOP = 3; // closes communication
+	private static final byte ADD_POINT = 0; 	// adds waypoint to path
+	private static final byte TRAVEL_PATH = 1; 	// enables slave to execute the path
+	private static final byte STATUS = 2; 		// enquires about slave's position
+	private static final byte STOP = 3; 		// closes communication
 
 	public static void main(String[] args) throws Exception {
 		USBConnection btc = USB.waitForConnection(); /* USB communication */
@@ -35,17 +35,17 @@ public class SlaveNav {
 				float addY = dis.readFloat();
 
 				switch (cmd) {
-				case ADD_POINT: 
+				case ADD_POINT:
 					nav.addWaypoint(addX,addY); //adds a waypoint to path queue
 					dos.writeFloat(0);
 					break;
-				case TRAVEL_PATH: 
+				case TRAVEL_PATH:
 					nav.followPath(); //initiates a path through waypoints
 					dos.writeFloat(0);
 					break;
 				case STATUS:
 					dos.writeBoolean(nav.pathCompleted()); // Returns true if the the final waypoint has been reached
-					break;				
+					break;
 				case STOP:
 					System.exit(1);
 				default:
