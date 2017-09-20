@@ -45,11 +45,10 @@ public class Teste {
         graph.addBothEdges(3, 4, distance(points[3].x, points[3].y, points[4].x, points[4].y));
         graph.addBothEdges(3, 9, distance(points[3].x, points[3].y, points[9].x, points[9].y));
         graph.addBothEdges(4, 9, distance(points[4].x, points[4].y, points[9].x, points[9].y));
-        graph.addBothEdges(5, 7, distance(points[5].x, points[5].y, points[7].x, points[7].y));
         graph.addBothEdges(7, 10, distance(points[7].x, points[7].y, points[10].x, points[10].y));
         graph.addBothEdges(10, 9, distance(points[10].x, points[10].y, points[9].x, points[9].y));
         graph.printGraph();
-
+        graph.Dijkstra(0, 10);
     }
 
 }
