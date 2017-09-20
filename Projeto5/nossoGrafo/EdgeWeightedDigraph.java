@@ -18,7 +18,7 @@ public class EdgeWeightedDigraph {
     }
 
     public Iterable<DirectedEdge> adj(int v) {
-        validateVertex(v); 
+        validateVertex(v);
         return adj[v];
     }
 
