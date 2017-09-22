@@ -56,5 +56,9 @@ public class Discrete {
 		return false;
 	}	
 
+  // Ideia de discretizar todo a matriz e fazer uma linha em cada horizontal e vertical
+  //  ver se essa linha corta algum objeto, e onde
+  //  essa maneira é a de menor complexidade O(n²)
+
 
 }
