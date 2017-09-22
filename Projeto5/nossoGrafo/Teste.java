@@ -1,11 +1,19 @@
-import lejos.pc.comm.*;
-import lejos.geom.*;
-import lejos.robotics.mapping.LineMap;
+// import lejos.pc.comm.*;
+// import lejos.geom.*;
+// import lejos.robotics.mapping.LineMap;
 import java.util.Scanner;
 import java.io.*;
-import lejos.util.Delay;
+// import lejos.util.Delay;
 
 public class Teste {
+
+    public static class Point {
+        double x, y;
+        public Point (double x, double y){
+            this.x = x;
+            this.y = y;
+        }
+    }
 
     private static Point[] points = {
         new Point(100,813),    /* P1 */
@@ -27,6 +35,7 @@ public class Teste {
 
     public static void main(String[] args) {
         Graph graph = new Graph (11);
+
         graph.addBothEdges(0, 1, distance(points[0].x, points[0].y, points[1].x, points[1].y));
         graph.addBothEdges(1, 2, distance(points[1].x, points[1].y, points[2].x, points[2].y));
         graph.addBothEdges(2, 3, distance(points[2].x, points[2].y, points[3].x, points[3].y));
@@ -36,9 +45,10 @@ public class Teste {
         graph.addBothEdges(3, 4, distance(points[3].x, points[3].y, points[4].x, points[4].y));
         graph.addBothEdges(3, 9, distance(points[3].x, points[3].y, points[9].x, points[9].y));
         graph.addBothEdges(4, 9, distance(points[4].x, points[4].y, points[9].x, points[9].y));
-        graph.addBothEdges(5, 7, distance(points[5].x, points[5].y, points[7].x, points[7].y));
         graph.addBothEdges(7, 10, distance(points[7].x, points[7].y, points[10].x, points[10].y));
         graph.addBothEdges(10, 9, distance(points[10].x, points[10].y, points[9].x, points[9].y));
+        graph.printGraph();
+        graph.Dijkstra(0, 10);
     }
 
 }

@@ -1,7 +1,11 @@
 public class DirectedEdge {
-    private int v;
-    private int w;
-    private double weight;
+    // private int v;
+    // private int w;
+    // private double weight;
+
+    public int v;
+    public int w;
+    public double weight;
 
     public DirectedEdge(int v, int w, double weight) {
         this.v = v;
@@ -10,15 +14,15 @@ public class DirectedEdge {
     }
 
     public int from() {
-        return v;
+        return this.v;
     }
 
     public int to() {
-        return w;
+        return this.w;
     }
 
     public double weight() {
-        return weight;
+        return this.weight;
     }
 
 }
