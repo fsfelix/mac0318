@@ -64,27 +64,93 @@ public class widthSearch {
         matrix[init.x()][init.y()] = 0.0;
     }
 
-    public static void main(String[] args) {
-        double [][] mapa = new double[3][3];
+    public static coord updatePosWithMinValue(double [][] map, coord tmp, int connectivity) {
+        int M = map.length;
+        int N = map[0].length;
+        int i = tmp.x();
+        int j = tmp.y();
+        int argmin = -1;
+        double min = Double.POSITIVE_INFINITY;
+        double [] costs = new double[connectivity];
+        coord updated = new coord(-1, -1);
 
-        for (int i = 0; i < mapa.length; i++) {
-            for (int j = 0; j < mapa[0].length; j++) {
-                mapa[i][j] = 0;
+        for (int ii = 0; ii < connectivity; ii++)
+            costs[ii] = Double.POSITIVE_INFINITY;
+
+        if (i - 1 >= 0 && map[i - 1][j] != -1)
+            costs[0] = map[i - 1][j];
+        if (i + 1 < M && map[i + 1][j] != -1)
+            costs[1] = map[i + 1][j];
+        if (j - 1 >= 0 && map[i][j - 1] != -1)
+            costs[2] = map[i][j - 1];
+        if (j + 1 < N && map[i][j + 1] != -1)
+            costs[3] = map[i][j + 1];
+
+        for (int ii = 0; ii < connectivity; ii++) {
+            if (costs[ii] < min) {
+                min = costs[ii];
+                argmin = ii;
             }
         }
 
+        if (argmin == 0) {
+            updated = new coord(i - 1, j);
+        }
+
+        if (argmin == 1) {
+            updated = new coord(i + 1, j);
+        }
+
+        if (argmin == 2) {
+            updated = new coord(i, j - 1);
+        }
+
+        if (argmin == 3) {
+            updated = new coord(i, j + 1);
+        }
+        return updated;
+    }
+
+    public static ArrayList <coord> getPath(double [][] map, coord init, coord goal, int connectivity) {
+        int i = goal.x();
+        int j = goal.y();
+        int i_init = init.x();
+        int j_init = init.y();
+        coord tmp = new coord(goal.x(), goal.y());
+        ArrayList <coord> path = new ArrayList <coord> ();
+
+        path.add(goal);
+        while (tmp.x() != i_init || tmp.y() != j_init) {
+            tmp = updatePosWithMinValue(map, tmp, connectivity);
+            path.add(0, tmp);
+        }
+
+        return path;
+    }
+
+    public static void main(String[] args) {
+        double [][] map = new double[3][3];
+        ArrayList <coord> path = new ArrayList <coord> ();
+
+        for (int i = 0; i < map.length; i++) {
+            for (int j = 0; j < map[0].length; j++) {
+                map[i][j] = 0;
+            }
+        }
 
         // printMatrix(mapa);
         coord init = new coord(0, 0);
         coord goal = new coord(2, 2);
 
-        // mapa[init.x()][init.y()] = -1;
-
         // exemplos de obstaculos:
-        mapa[1][1] = -1;
-        mapa[1][2] = -1;
+        map[1][1] = -1;
+        map[1][2] = -1;
 
-        search(mapa, init, goal, 4);
-        printMatrix(mapa);
+        search(map, init, goal, 4);
+        printMatrix(map);
+        path = getPath(map, init, goal, 4);
+        for (coord p : path)
+            System.out.println(p.x() + " " + p.y());
+
     }
 }
