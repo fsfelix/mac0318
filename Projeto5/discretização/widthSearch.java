@@ -41,7 +41,13 @@ public class widthSearch {
     public static void printMatrix(double[][] matrix) {
         for (int i = 0; i < matrix.length; i++) {
             for (int j = 0; j < matrix[i].length; j++) {
-                System.out.print(matrix[i][j] + " ");
+                if (matrix[i][j] == -1.0)
+                    System.out.print("1 ");
+                else if (matrix[i][j] != 0.0)
+                    System.out.print(matrix[i][j] + " ");
+                else
+                    System.out.print("  ");
+
             }
             System.out.println();
         }
@@ -102,24 +108,44 @@ public class widthSearch {
             costs[3] = map[i][j + 1];
 
         argmin = argmin(costs);
-
+        // if (argmin == -1) {
+        //     for (int ii = 0; ii < costs.length; i++)
+        //         System.out.println(costs[ii]);
+        // }
         if (argmin == 0) {
+            map[i - 1][j] = -1;
             updated = new coord(i - 1, j);
         }
 
         if (argmin == 1) {
+            map[i + 1][j] = -1;
             updated = new coord(i + 1, j);
         }
 
         if (argmin == 2) {
+            map[i][j - 1] = -1;
             updated = new coord(i, j - 1);
         }
 
         if (argmin == 3) {
+            map[i][j + 1] = -1;
             updated = new coord(i, j + 1);
         }
+
         return updated;
     }
+
+    public static void printMatrixOriginal(double[][] matrix) {
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix[i].length; j++) {
+                System.out.print(matrix[i][j] + " ");
+            }
+            System.out.println();
+        }
+    }
+
+
+
 
     public static ArrayList <coord> getPath(double [][] map, coord init, coord goal, int connectivity) {
         int i = goal.x();
@@ -132,38 +158,51 @@ public class widthSearch {
         path.add(goal);
         while (tmp.x() != i_init || tmp.y() != j_init) {
             tmp = updatePosWithMinValue(map, tmp, connectivity);
+            if (tmp.x() == -1 && tmp.y() == -1)
+                System.out.println("Deu merda");
+
             path.add(0, tmp);
         }
-
         return path;
     }
 
-    // public static void main(String[] args) {
-    //     double [][] map = new double[3][3];
-    //     ArrayList <coord> path = new ArrayList <coord> ();
+    public static void main(String[] args) {
+        double [][] map = new double[3][3];
+        ArrayList <coord> path = new ArrayList <coord> ();
 
-    //     for (int i = 0; i < map.length; i++) {
-    //         for (int j = 0; j < map[0].length; j++) {
-    //             map[i][j] = 0;
-    //         }
-    //     }
-    //     // printMatrix(mapa);
-    //     coord init = new coord(0, 0);
-    //     coord goal = new coord(2, 2);
+        for (int i = 0; i < map.length; i++) {
+            for (int j = 0; j < map[0].length; j++) {
+                map[i][j] = 0;
+            }
+        }
 
-    //     // exemplos de obstaculos:
-    //     map[1][1] = -1;
-    //     map[1][2] = -1;
-    //     printMatrix(map);
-    //     System.out.println();
+        // exemplos de obstaculos:
+        map[1][1] = -1;
+        map[1][2] = -1;
 
-    //     search(map, init, goal, 4);
-    //     printMatrix(map);
-    //     path = getPath(map, init, goal, 4);
+        Discrete dsc = new Discrete (40, 40);
+        dsc.populateMap();
+        printMatrix(dsc.map);
+        System.out.println(dsc.map.length);
+        System.out.println(dsc.map[0].length);
 
-    // for (coord p : path)
-    //     System.out.println(p.x() + " " + p.y());
+        coord init = new coord(0, 0);
+        coord goal = new coord(10, 3);
 
-    // }
-    
+        search(dsc.map, init, goal, 4);
+
+        path = getPath(dsc.map, init, goal, 4);
+
+        // coord init = new coord(0, 0);
+        // coord goal = new coord(2, 2);
+
+        // search(map, init, goal, 4);
+        // printMatrixOriginal(map);
+
+        // path = getPath(map, init, goal, 4);
+
+        for (coord p : path)
+            System.out.println(p.x() + " " + p.y());
+
+    }
 }

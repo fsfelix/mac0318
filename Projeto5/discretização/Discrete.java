@@ -7,7 +7,7 @@ public class Discrete {
     private double height;
     private int M; // linhas
     private int N; // colunas
-    public [][] double map;
+    public double [][] map;
 
     Line[] lines = {
 
@@ -36,11 +36,11 @@ public class Discrete {
     Rectangle bounds = new Rectangle(0, 0, 1195, 920); 
     LineMap mymap = new LineMap(lines, bounds);
 
-    public Discrete (int w, int h){
+    public Discrete (double w, double h){
         this.width 	= w;
         this.height = h;
-        this.M = Math.ceil(1195/h);
-        this.N = Math.ceil(920/w);
+        this.M = (int) Math.ceil(1195.0/h);
+        this.N = (int) Math.ceil(920.0/w);
         this.map = new double[this.M][this.N];
 
         for (int i = 0; i < map.length; i++) {
@@ -51,7 +51,7 @@ public class Discrete {
 
     }
 
-    public static void printMatrix(double[][] matrix) {
+    public void printMatrix(double[][] matrix) {
         for (int i = 0; i < matrix.length; i++) {
             for (int j = 0; j < matrix[i].length; j++) {
                 System.out.print(matrix[i][j] + " ");
@@ -61,18 +61,18 @@ public class Discrete {
 
     }
 
-    public static void populateMap() {
+    public void populateMap() {
         for (int i = 0; i < this.M; i++) {
             for (int j = 0; j < this.N; j++) {
                 Line [] currentLines = new Line[4];
-                currentLines[0] = new Line(i * this.h, j * this.w, i * this.h, (j + 1) * this.w);
-                currentLines[1] = new Line(i * this.h, (j + 1) * this.w, (i + 1) * this.h, (j + 1) * this.w);
-                currentLines[2] = new Line((i + 1) * this.h, (j + 1) * this.w, (i + 1) * this.h, j * this.w);
-                currentLines[3] = new Line((i + 1) * this.h, j * this.w, i * this.h, j * this.w);
+                currentLines[0] = new Line((int) Math.ceil(i * this.height), (int) Math.ceil(j * this.width), (int) Math.ceil(i * this.height), (int) Math.ceil((j + 1) * this.width));
+                currentLines[1] = new Line((int) Math.ceil(i * this.height), (int) Math.ceil((j + 1) * this.width), (int) Math.ceil((i + 1) * this.height), (int) Math.ceil((j + 1) * this.width));
+                currentLines[2] = new Line((int) Math.ceil((i + 1) * this.height), (int) Math.ceil((j + 1) * this.width), (int) Math.ceil((i + 1) * this.height), (int) Math.ceil(j * this.width));
+                currentLines[3] = new Line((int) Math.ceil((i + 1) * this.height), (int) Math.ceil(j * this.width), (int) Math.ceil(i * this.height), (int) Math.ceil(j * this.width));
                 loop:
-                for (int iLine = 0; i < 4; iLine++) {
+                for (int iLine = 0; iLine < 4; iLine++) {
                     for (int iObj = 0; iObj < 14; iObj++) {
-                        if (currentLine[iLine].intersectsAt(lines[iObj]) != null) {
+                        if (currentLines[iLine].intersectsAt(lines[iObj]) != null) {
                             this.map[i][j] = -1;
                             break loop;
                         }
@@ -82,7 +82,6 @@ public class Discrete {
             }
         }
     }
-
 
     // Ideia de discretizar todo a matriz e fazer uma linha em cada horizontal e vertical
     //  ver se essa linha corta algum objeto, e onde
