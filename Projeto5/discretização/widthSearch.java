@@ -17,7 +17,6 @@ public class widthSearch {
             coordList.add(new coord(i, j - 1));
         if (j + 1 < N && matrix[i][j + 1] == 0.0)
             coordList.add(new coord(i, j + 1));
-
         return coordList;
     }
 
@@ -28,7 +27,7 @@ public class widthSearch {
             return false;
     }
 
-    public static void updateNeighbour(double[][] matrix, coord current, coord n, int connectivity) {
+    public static void updateNeighbour(double[][] matrix, coord current, coord n) {
         if (current.x() != n.x() && current.y() != n.y())
             matrix[n.x()][n.y()] = matrix[current.x()][current.y()] + Math.sqrt(2);
         else
@@ -45,10 +44,10 @@ public class widthSearch {
 
     }
 
-    public static void search(double[][] matrix, coord inicio, coord goal, int connectivity) {
+    public static void search(double[][] matrix, coord init, coord goal, int connectivity) {
         ArrayList <coord> coordList = new ArrayList <coord> ();
         boolean found = false;
-        coordList.add(inicio);
+        coordList.add(init);
 
         while (!found) {
             coord current = coordList.remove(0);
@@ -58,12 +57,11 @@ public class widthSearch {
                     System.out.println("Encontramos a meta");
                     found = true;
                 }
-                updateNeighbour(matrix, current, n, connectivity);
-                printMatrix(matrix);
-                System.out.println();
+                updateNeighbour(matrix, current, n);
                 coordList.add(n);
             }
         }
+        matrix[init.x()][init.y()] = 0.0;
     }
 
     public static void main(String[] args) {
@@ -87,6 +85,6 @@ public class widthSearch {
         mapa[1][2] = -1;
 
         search(mapa, init, goal, 4);
-
+        printMatrix(mapa);
     }
 }
