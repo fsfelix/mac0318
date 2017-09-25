@@ -2,6 +2,10 @@ import java.util.ArrayList;
 
 public class widthSearch {
 
+    public widthSearch () {
+        
+    }
+
     public static ArrayList <coord> getNeighbours(double[][] matrix, coord current, int connectivity) {
         ArrayList <coord> coordList = new ArrayList <coord> ();
         int M = matrix.length;
@@ -64,13 +68,24 @@ public class widthSearch {
         matrix[init.x()][init.y()] = 0.0;
     }
 
+    public static int argmin(double [] array) {
+        double min = Double.POSITIVE_INFINITY;
+        int argmin = -1;
+        for (int ii = 0; ii < array.length; ii++) {
+            if (array[ii] < min) {
+                min = array[ii];
+                argmin = ii;
+            }
+        }
+        return argmin;
+    }
+
     public static coord updatePosWithMinValue(double [][] map, coord tmp, int connectivity) {
         int M = map.length;
         int N = map[0].length;
         int i = tmp.x();
         int j = tmp.y();
         int argmin = -1;
-        double min = Double.POSITIVE_INFINITY;
         double [] costs = new double[connectivity];
         coord updated = new coord(-1, -1);
 
@@ -86,12 +101,7 @@ public class widthSearch {
         if (j + 1 < N && map[i][j + 1] != -1)
             costs[3] = map[i][j + 1];
 
-        for (int ii = 0; ii < connectivity; ii++) {
-            if (costs[ii] < min) {
-                min = costs[ii];
-                argmin = ii;
-            }
-        }
+        argmin = argmin(costs);
 
         if (argmin == 0) {
             updated = new coord(i - 1, j);
@@ -128,29 +138,32 @@ public class widthSearch {
         return path;
     }
 
-    public static void main(String[] args) {
-        double [][] map = new double[3][3];
-        ArrayList <coord> path = new ArrayList <coord> ();
+    // public static void main(String[] args) {
+    //     double [][] map = new double[3][3];
+    //     ArrayList <coord> path = new ArrayList <coord> ();
 
-        for (int i = 0; i < map.length; i++) {
-            for (int j = 0; j < map[0].length; j++) {
-                map[i][j] = 0;
-            }
-        }
+    //     for (int i = 0; i < map.length; i++) {
+    //         for (int j = 0; j < map[0].length; j++) {
+    //             map[i][j] = 0;
+    //         }
+    //     }
+    //     // printMatrix(mapa);
+    //     coord init = new coord(0, 0);
+    //     coord goal = new coord(2, 2);
 
-        // printMatrix(mapa);
-        coord init = new coord(0, 0);
-        coord goal = new coord(2, 2);
+    //     // exemplos de obstaculos:
+    //     map[1][1] = -1;
+    //     map[1][2] = -1;
+    //     printMatrix(map);
+    //     System.out.println();
 
-        // exemplos de obstaculos:
-        map[1][1] = -1;
-        map[1][2] = -1;
+    //     search(map, init, goal, 4);
+    //     printMatrix(map);
+    //     path = getPath(map, init, goal, 4);
 
-        search(map, init, goal, 4);
-        printMatrix(map);
-        path = getPath(map, init, goal, 4);
-        for (coord p : path)
-            System.out.println(p.x() + " " + p.y());
+    // for (coord p : path)
+    //     System.out.println(p.x() + " " + p.y());
 
-    }
+    // }
+    
 }
