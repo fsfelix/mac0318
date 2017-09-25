@@ -1,5 +1,13 @@
 import java.util.ArrayList;
 
+/*
+
+  Na matriz -2 indica a posicao inicial da busca, -1 obstaculos, 0 posicoes
+  nao visitadas pelo algoritmo de busca, e qualquer outra coisa custo de
+  movimentacao da posicao inicial até a meta.
+
+ */
+
 public class widthSearch {
 
     public widthSearch () {
@@ -71,7 +79,7 @@ public class widthSearch {
                 coordList.add(n);
             }
         }
-        matrix[init.x()][init.y()] = 0.0;
+        matrix[init.x()][init.y()] = -2.0;
     }
 
     public static int argmin(double [] array) {
@@ -98,37 +106,41 @@ public class widthSearch {
         for (int ii = 0; ii < connectivity; ii++)
             costs[ii] = Double.POSITIVE_INFINITY;
 
-        if (i - 1 >= 0 && map[i - 1][j] != -1)
+        if (i - 1 >= 0 && map[i - 1][j] != -1.0 && map[i - 1][j] != 0.0)
             costs[0] = map[i - 1][j];
-        if (i + 1 < M && map[i + 1][j] != -1)
+        if (i + 1 < M && map[i + 1][j] != -1.0 && map[i + 1][j] != 0.0)
             costs[1] = map[i + 1][j];
-        if (j - 1 >= 0 && map[i][j - 1] != -1)
+        if (j - 1 >= 0 && map[i][j - 1] != -1.0 && map[i][j - 1] != 0.0)
             costs[2] = map[i][j - 1];
-        if (j + 1 < N && map[i][j + 1] != -1)
+        if (j + 1 < N && map[i][j + 1] != -1.0 && map[i][j + 1] != 0.0)
             costs[3] = map[i][j + 1];
 
         argmin = argmin(costs);
-        // if (argmin == -1) {
-        //     for (int ii = 0; ii < costs.length; i++)
-        //         System.out.println(costs[ii]);
-        // }
+        if (argmin == -1) {
+            // for (int ii = 0; ii < costs.length; i++)
+            //     System.out.println(costs[ii]);
+            System.out.println(map[i - 1][j]);
+            System.out.println(map[i + 1][j]);
+            System.out.println(map[i][j - 1]);
+            System.out.println(map[i][j + 1]);
+        }
         if (argmin == 0) {
-            map[i - 1][j] = -1;
+            // map[i - 1][j] = -1;
             updated = new coord(i - 1, j);
         }
 
         if (argmin == 1) {
-            map[i + 1][j] = -1;
+            // map[i + 1][j] = -1;
             updated = new coord(i + 1, j);
         }
 
         if (argmin == 2) {
-            map[i][j - 1] = -1;
+            // map[i][j - 1] = -1;
             updated = new coord(i, j - 1);
         }
 
         if (argmin == 3) {
-            map[i][j + 1] = -1;
+            // map[i][j + 1] = -1;
             updated = new coord(i, j + 1);
         }
 
@@ -144,9 +156,6 @@ public class widthSearch {
         }
     }
 
-
-
-
     public static ArrayList <coord> getPath(double [][] map, coord init, coord goal, int connectivity) {
         int i = goal.x();
         int j = goal.y();
@@ -161,48 +170,29 @@ public class widthSearch {
             if (tmp.x() == -1 && tmp.y() == -1)
                 System.out.println("Deu merda");
 
+            // for (coord p : path)
+            //     System.out.println(p.x() + " " + p.y());
+
             path.add(0, tmp);
         }
         return path;
     }
 
     public static void main(String[] args) {
-        double [][] map = new double[3][3];
         ArrayList <coord> path = new ArrayList <coord> ();
-
-        for (int i = 0; i < map.length; i++) {
-            for (int j = 0; j < map[0].length; j++) {
-                map[i][j] = 0;
-            }
-        }
-
-        // exemplos de obstaculos:
-        map[1][1] = -1;
-        map[1][2] = -1;
 
         Discrete dsc = new Discrete (40, 40);
         dsc.populateMap();
         printMatrix(dsc.map);
-        System.out.println(dsc.map.length);
-        System.out.println(dsc.map[0].length);
 
         coord init = new coord(0, 0);
         coord goal = new coord(10, 3);
 
         search(dsc.map, init, goal, 4);
-
         path = getPath(dsc.map, init, goal, 4);
 
-        // coord init = new coord(0, 0);
-        // coord goal = new coord(2, 2);
-
-        // search(map, init, goal, 4);
-        // printMatrixOriginal(map);
-
-        // path = getPath(map, init, goal, 4);
-
         for (coord p : path)
-            System.out.println(p.x() + " " + p.y());
+           System.out.println(p.x() + " " + p.y());
 
     }
 }
