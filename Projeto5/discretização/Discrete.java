@@ -58,7 +58,6 @@ public class Discrete {
             }
             System.out.println();
         }
-
     }
 
     public void populateMap() {
