@@ -9,7 +9,7 @@
 
 ## Parte B (buscas)
 
-- [ ] Implementar o algoritmo de busca de custo uniforme (Dijkstra), com o custo de cada ação sendo a distância entre posições
+- [x] Implementar o algoritmo de busca de custo uniforme (Dijkstra), com o custo de cada ação sendo a distância entre posições
 - [ ] Utilize o algoritmo para encontrar trajetória levando robô de P1 a P10
 - [ ] Utilize o algoritmo para encontrar trajetória levando robô de P10 a P1
 - [ ] Fazer o robô executar trajetórias e meça distância final à meta
@@ -17,7 +17,7 @@
 
 ## Parte C (discretização e linearização)
 
-- [ ] Implementar o algoritmo de planejamento por frente de onda
+- [x] Implementar o algoritmo de planejamento por frente de onda
 - [ ] Fazer o robô executar trajetórias e meça distância final à meta
 
 
