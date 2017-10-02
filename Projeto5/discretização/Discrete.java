@@ -1,6 +1,10 @@
+import java.util.ArrayList;
+import lejos.pc.comm.*;
 import lejos.geom.*;
 import lejos.robotics.mapping.LineMap;
-
+import java.util.Scanner;
+import java.io.*;
+import lejos.util.Delay;
 
 public class Discrete {
     private double width;
@@ -33,7 +37,7 @@ public class Discrete {
 
     };
 
-    Rectangle bounds = new Rectangle(0, 0, 1195, 920); 
+    Rectangle bounds = new Rectangle(0, 0, 1195, 920);
     LineMap mymap = new LineMap(lines, bounds);
 
     public Discrete (double w, double h){
@@ -45,10 +49,10 @@ public class Discrete {
 
         for (int i = 0; i < map.length; i++) {
             for (int j = 0; j < map[i].length; j++) {
-                map[i][j] = 0;
+                this.map[i][j] = 0;
             }
         }
-
+        populateMap();
     }
 
     public void printMatrix(double[][] matrix) {
@@ -82,10 +86,63 @@ public class Discrete {
         }
     }
 
-    // Ideia de discretizar todo a matriz e fazer uma linha em cada horizontal e vertical
-    //  ver se essa linha corta algum objeto, e onde
-    //  essa maneira é a de menor complexidade O(n²)
+    public void thicken() {
+        double [][] newMap = new double[this.M][this.N];
+
+        for (int i = 0; i < map.length; i++) {
+            for (int j = 0; j < map[i].length; j++) {
+                if (this.map[i][j] == -1)
+                    newMap[i][j] = -1;
+                else
+                    newMap[i][j] = 0;
+            }
+        }
 
 
+        for (int i = 0; i < this.M; i++) {
+            for (int j = 0; j < this.N; j++) {
+                if (this.map[i][j] == -1.0) {
 
+                    if (i - 1 >= 0 && this.map[i - 1][j] != -1.0)
+                        newMap[i - 1][j] = -1.0;
+
+                    if (i + 1 < this.M && this.map[i + 1][j] != -1.0)
+                        newMap[i + 1][j] = -1.0;
+
+                    if (j - 1 >= 0 && this.map[i][j - 1] != -1.0)
+                        newMap[i][j - 1] = -1.0;
+
+                    if (j + 1 < this.N && this.map[i][j + 1] != -1.0)
+                        newMap[i][j + 1] = -1.0;
+
+                    /*8 vizinhanca*/
+
+                    if (i - 1 >= 0 && j - 1 >= 0 && this.map[i - 1][j - 1] != -1.0)
+                        newMap[i - 1][j - 1] = -1.0;
+                    if (i - 1 >= 0 && j + 1 < this.N && this.map[i - 1][j + 1] != -1.0)
+                        newMap[i - 1][j + 1] = -1.0;
+                    if (i + 1 < this.M && j - 1 >= 0  && this.map[i + 1][j - 1] != -1.0)
+                        newMap[i + 1][j - 1] = -1.0;
+                    if (i + 1 < this.M && j + 1 < this.N && this.map[i + 1][j + 1] != -1.0)
+                        newMap[i + 1][j + 1] = -1.0;
+                }
+
+            }
+        }
+        this.map = newMap;
+    }
+
+    public static ArrayList <Point> xyToMap(ArrayList <coord> path, int w, int h) {
+        ArrayList <Point> points = new ArrayList <Point> ();
+        for (coord p : path) {
+            Point tmp = new Point((int) Math.round(p.x() * w), (int) Math.round(p.y() * h));
+            points.add(tmp);
+        }
+
+        return points;
+    }
+
+    // public static ArrayList <coord> linearizePath(ArrayList <coord> path, int w, int h) {
+        
+    // }
 }

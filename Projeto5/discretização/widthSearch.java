@@ -180,19 +180,22 @@ public class widthSearch {
 
     public static void main(String[] args) {
         ArrayList <coord> path = new ArrayList <coord> ();
-
         Discrete dsc = new Discrete (40, 40);
-        dsc.populateMap();
+
         printMatrix(dsc.map);
 
-        coord init = new coord(0, 0);
-        coord goal = new coord(10, 3);
+        dsc.thicken();
 
-        search(dsc.map, init, goal, 4);
-        path = getPath(dsc.map, init, goal, 4);
+        printMatrix(dsc.map);
 
-        for (coord p : path)
-           System.out.println(p.x() + " " + p.y());
+        // coord init = new coord(0, 0);
+        // coord goal = new coord(10, 3);
+
+        // search(dsc.map, init, goal, 4);
+        // path = getPath(dsc.map, init, goal, 4);
+
+        // for (coord p : path)
+        //    System.out.println(p.x() + " " + p.y());
 
     }
 }

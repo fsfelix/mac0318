@@ -1,4 +1,3 @@
-
 public class coord {
     private final int x;
     private final int y;

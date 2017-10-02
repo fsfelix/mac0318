@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import lejos.pc.comm.*;
 import lejos.geom.*;
 import lejos.robotics.mapping.LineMap;
@@ -5,7 +6,7 @@ import java.util.Scanner;
 import java.io.*;
 import lejos.util.Delay;
 
-public class MasterNav {
+public class RobotMain {
     private static final byte ADD_POINT = 0; //adds waypoint to path
     private static final byte TRAVEL_PATH = 1; // enables slave to execute the path
     private static final byte STATUS = 2; // enquires about slave's position 
@@ -100,40 +101,36 @@ public class MasterNav {
         master.connect();
         Scanner scan = new Scanner( System.in );
 
-        int [] trajetoria1 = {1, 2, 3, 4, 10};
-        int [] trajetoria2 = {1, 2, 6, 5, 10};
-        int [] trajetoria3 = {1, 2, 7, 8, 11, 10};
+        /***********************************************/
 
-        // while(true) {
-            // System.out.print("Enter command [0:ADD_POINT 1:TRAVEL_PATH 2:STATUS 3:STOP]: ");
-            // cmd = (byte) scan.nextFloat();
-            // if (cmd == 0){
-            //     System.out.println("Enter P-");
-            //     int num  = scan.nextInt();
-            //     addX = points[num-1].x/10;
-            //     addY = points[num-1].y/10;
-            //     // System.out.println("Enter coordinate X: ");
-            //     // addX = scan.nextFloat();
-            //     // System.out.println("Enter coordinate Y: ");
-            //     // addY = scan.nextFloat();
-            // } else {
-            //     addX = -1;
-            //     addY = -1;
-            // }
-            // if (cmd == 2){
-            //     boolRet = master.sendCommand(cmd);
-            //     System.out.println("cmd: " + " return: " + boolRet);
-            // }else{
-            //     ret = master.sendCommand(cmd, addX, addY); // return 0 when Slave successfully recieved the dos
-            //     System.out.println("X: " + addX + " X: " + "Y: " + addY +" return: " + ret);
-            // }
+        ArrayList <coord> path = new ArrayList <coord> ();
+        ArrayList <Point> points = new ArrayList <Point> ();
 
-        // }
-        for (int i = 0; i < trajetoria3.length; i++)
-            {
-                ret = master.sendCommand((byte) 0, points[trajetoria3[i] - 1].x/10, points[trajetoria3[i] - 1].y/10);
-                Delay.msDelay(100);
-            }
+        coord init = new coord(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
+        coord goal = new coord(Integer.parseInt(args[2]), Integer.parseInt(args[3]));
+
+        Discrete dsc = new Discrete (40, 40);
+        widthSearch wS = new widthSearch();
+
+        wS.search(dsc.map, init, goal, 4);
+        path = wS.getPath(dsc.map, init, goal, 4);
+        // path = wS.getPath(dsc.map, goal, init, 4);
+
+        for (coord p : path)
+            System.out.println(p.x() + " " + p.y());
+
+        points = dsc.xyToMap(path, 40, 40);
+
+        for (Point p : points)
+            System.out.println(p.x + " " + p.y);
+
+        /***********************************************/
+
+        for (Point p : points) {
+            ret = master.sendCommand((byte) 0, (int) p.x/10, (int) p.y/10);
+            Delay.msDelay(100);
+
+        }
         ret = master.sendCommand((byte) 1, -1, -1);
         int num = scan.nextInt();
     }
