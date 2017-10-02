@@ -142,7 +142,43 @@ public class Discrete {
         return points;
     }
 
-    // public static ArrayList <coord> linearizePath(ArrayList <coord> path, int w, int h) {
-        
-    // }
+    public ArrayList <coord> linearizePath(ArrayList <coord> path, int w, int h) {
+        coord[] pathArray = new coord[path.size()];
+        pathArray = path.toArray(pathArray);
+
+        int init, current;
+        ArrayList <coord> newPath = new ArrayList <coord> ();
+
+        for (init = 0; init < pathArray.length; ) {
+            boolean found = false;
+            for (current = init + 1; current < pathArray.length; current++) {
+                found = false;
+                Line tmp = new Line((int) (pathArray[init].x()*this.width), (int)(pathArray[init].y()*this.height), (int)(pathArray[current].x()*this.width), (int)(pathArray[current].y()*this.height) );
+
+                for (int l = 0; l < lines.length && !found; l++) {
+                    if (tmp.intersectsAt(lines[l]) != null) {
+                        found = true;
+                    }
+                }
+
+                if (found) {
+                    newPath.add(pathArray[init]);
+                    newPath.add(pathArray[current - 1]);
+                    init = current - 1;
+                    current = init + 1;
+                }
+                System.out.println("init: " + init + " current: " + current);
+            }
+
+            if (!found) {
+                newPath.add(pathArray[init]);
+                newPath.add(pathArray[current - 1]);
+                break;
+            }
+
+        }
+
+        return newPath;
+    }
+
 }
