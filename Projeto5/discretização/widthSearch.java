@@ -229,6 +229,31 @@ public class widthSearch {
 
     }
 
+    public static ArrayList <coord> frenteDeOnda(int SR, coord init, coord goal, boolean linearize) {
+        ArrayList <coord> path = new ArrayList <coord> ();
+        Discrete dsc = new Discrete (SR, SR);
+
+        drawMatrix(dsc);
+        drawObjective(dsc, init, goal);
+
+        search(dsc.map, goal, init, 4);
+        path = getPath(dsc.map, goal, init, 4);
+        Collections.reverse(path);
+        drawPath(dsc, path);
+
+        for (coord p : path)
+            System.out.println(p.x() + " " + p.y());
+
+        if (linearize) {
+            ArrayList <coord> newPath = new ArrayList <coord> ();
+            newPath = dsc.linearizePath(path, SR, SR);
+            return newPath;
+        }
+
+        else {
+            return path;
+        }
+    }
 
     public static void main(String[] args) {
         ArrayList <coord> path = new ArrayList <coord> ();
@@ -242,28 +267,28 @@ public class widthSearch {
 
         // // printMatrix(dsc.map);
 
-        drawMatrix(dsc);
+        // drawMatrix(dsc);
 
         coord init = new coord(0, 0);
         coord goal = new coord(20, 12);
-
-        drawObjective(dsc, init, goal);
+        path = frenteDeOnda(40, init, goal, false);
+        // drawObjective(dsc, init, goal);
 
         // search(dsc.map, init, goal, 4);
         // path = getPath(dsc.map, init, goal, 4);
 
         /* FRENTE DE ONDA */
 
-        search(dsc.map, goal, init, 4);
-        path = getPath(dsc.map, goal, init, 4);
-        Collections.reverse(path);
+        // search(dsc.map, goal, init, 4);
+        // path = getPath(dsc.map, goal, init, 4);
+        // Collections.reverse(path);
 
-        for (coord p : path)
-           System.out.println(p.x() + " " + p.y());
+        // for (coord p : path)
+        //    System.out.println(p.x() + " " + p.y());
 
         // newPath = dsc.linearizePath(path, 20, 20);
 
-        drawPath(dsc, path);
+        // drawPath(dsc, path);
         // for (coord p : newPath)
         //     System.out.println(p.x() + " " + p.y());
 
