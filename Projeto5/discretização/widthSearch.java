@@ -1,5 +1,5 @@
 import java.util.ArrayList;
-
+import java.util.Collections;
 /*
 
   Na matriz -2 indica a posicao inicial da busca, -1 obstaculos, 0 posicoes
@@ -228,6 +228,8 @@ public class widthSearch {
         StdDraw.point((double)goal.x()/(double)M + RADIUS/2, (double)goal.y()/N + RADIUS/2);
 
     }
+
+
     public static void main(String[] args) {
         ArrayList <coord> path = new ArrayList <coord> ();
         ArrayList <coord> newPath = new ArrayList <coord> ();
@@ -236,26 +238,32 @@ public class widthSearch {
         // System.out.println(dsc.map.length + " " + dsc.map[0].length);
         // printMatrix(dsc.map);
 
-        // // dsc.thicken();
+        // dsc.thicken();
 
         // // printMatrix(dsc.map);
 
         drawMatrix(dsc);
 
         coord init = new coord(0, 0);
-        coord goal = new coord(20, 22);
+        coord goal = new coord(20, 12);
+
         drawObjective(dsc, init, goal);
 
-        search(dsc.map, init, goal, 4);
-        path = getPath(dsc.map, init, goal, 4);
+        // search(dsc.map, init, goal, 4);
+        // path = getPath(dsc.map, init, goal, 4);
 
-        drawPath(dsc, path);
+        /* FRENTE DE ONDA */
+
+        search(dsc.map, goal, init, 4);
+        path = getPath(dsc.map, goal, init, 4);
+        Collections.reverse(path);
 
         for (coord p : path)
            System.out.println(p.x() + " " + p.y());
 
-        // newPath = dsc.linearizePath(path, 40, 40);
+        // newPath = dsc.linearizePath(path, 20, 20);
 
+        drawPath(dsc, path);
         // for (coord p : newPath)
         //     System.out.println(p.x() + " " + p.y());
 
