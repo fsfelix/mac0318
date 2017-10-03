@@ -178,30 +178,86 @@ public class widthSearch {
         return path;
     }
 
+    public static void drawMatrix(Discrete dsc) {
+        int M = dsc.map.length;
+        int N = dsc.map[0].length;
+        double RADIUS = (double) (M*N)/75000;
+        StdDraw.setCanvasSize(M * 15, N * 15);
+        StdDraw.setPenRadius(RADIUS);
+        StdDraw.clear(StdDraw.LIGHT_GRAY);
+
+        for (int i = 0; i < M; i++) {
+            for (int j = 0; j < N; j++) {
+                if (dsc.map[i][j] == 0) {
+                    StdDraw.setPenColor(StdDraw.GRAY);
+                    StdDraw.point((double)i/(double)M + RADIUS/2, (double)j/N + RADIUS/2);
+                }
+                else if (dsc.map[i][j] == -1) {
+                    StdDraw.setPenColor(StdDraw.PINK);
+                    StdDraw.point((double)i/(double)M + RADIUS/2, (double)j/N + RADIUS/2);
+
+                }
+
+            }
+        }
+    }
+
+
+    public static void drawPath(Discrete dsc, ArrayList <coord> path) {
+        int M = dsc.map.length;
+        int N = dsc.map[0].length;
+        double RADIUS = (double) (M*N)/75000;
+        StdDraw.setPenRadius(RADIUS);
+
+        for (coord p : path) {
+            StdDraw.setPenColor(StdDraw.ORANGE);
+            StdDraw.point((double)p.x()/(double)M + RADIUS/2, (double)p.y()/N + RADIUS/2);
+        }
+    }
+
+    public static void drawObjective(Discrete dsc, coord init, coord goal) {
+        int M = dsc.map.length;
+        int N = dsc.map[0].length;
+        double RADIUS = (double) (M*N)/75000;
+        StdDraw.setPenRadius(RADIUS*2);
+
+        StdDraw.setPenColor(StdDraw.RED);
+        StdDraw.point((double)init.x()/(double)M + RADIUS/2, (double)init.y()/N + RADIUS/2);
+
+        StdDraw.setPenColor(StdDraw.GREEN);
+        StdDraw.point((double)goal.x()/(double)M + RADIUS/2, (double)goal.y()/N + RADIUS/2);
+
+    }
     public static void main(String[] args) {
         ArrayList <coord> path = new ArrayList <coord> ();
         ArrayList <coord> newPath = new ArrayList <coord> ();
         Discrete dsc = new Discrete (40, 40);
-        System.out.println(dsc.map.length + " " + dsc.map[0].length);
-        printMatrix(dsc.map);
-        
-        // dsc.thicken();
 
+        // System.out.println(dsc.map.length + " " + dsc.map[0].length);
         // printMatrix(dsc.map);
+
+        // // dsc.thicken();
+
+        // // printMatrix(dsc.map);
+
+        drawMatrix(dsc);
 
         coord init = new coord(0, 0);
         coord goal = new coord(20, 22);
+        drawObjective(dsc, init, goal);
 
         search(dsc.map, init, goal, 4);
         path = getPath(dsc.map, init, goal, 4);
 
+        drawPath(dsc, path);
+
         for (coord p : path)
            System.out.println(p.x() + " " + p.y());
 
-        newPath = dsc.linearizePath(path, 40, 40);
+        // newPath = dsc.linearizePath(path, 40, 40);
 
-        for (coord p : newPath)
-            System.out.println(p.x() + " " + p.y());
+        // for (coord p : newPath)
+        //     System.out.println(p.x() + " " + p.y());
 
     }
 }
