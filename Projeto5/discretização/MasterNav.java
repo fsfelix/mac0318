@@ -95,38 +95,59 @@ public class MasterNav {
             System.err.println("IO Exception");
         }
     }
+
+    public static ArrayList <Point> xyToMap(ArrayList <coord> path, int w, int h) {
+        ArrayList <Point> points = new ArrayList <Point> ();
+        for (coord p : path) {
+            Point tmp = new Point((int) Math.round(p.x() * w), (int) Math.round(p.y() * h));
+            points.add(tmp);
+        }
+
+        return points;
+    }
+
     public static void main(String[] args) {
         byte cmd = 0; float param = 0f; float ret=0f; float addX = 0f; float addY = 0f; boolean boolRet = false;
         MasterNav master = new MasterNav();
         master.connect();
         Scanner scan = new Scanner( System.in );
 
-        /***********************************************/
-
         ArrayList <coord> path = new ArrayList <coord> ();
-        ArrayList <Point> points = new ArrayList <Point> ();
-
-        coord init = new coord(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
-        coord goal = new coord(Integer.parseInt(args[2]), Integer.parseInt(args[3]));
-
-        Discrete dsc = new Discrete (40, 40);
-        widthSearch wS = new widthSearch();
-
-        wS.search(dsc.map, init, goal, 4);
-        path = wS.getPath(dsc.map, init, goal, 4);
-        // path = wS.getPath(dsc.map, goal, init, 4);
-
-        for (coord p : path)
-            System.out.println(p.x() + " " + p.y());
-
-        points = dsc.xyToMap(path, 40, 40);
-
-        for (Point p : points)
-            System.out.println(p.x + " " + p.y);
+        ArrayList <Point> pointsPath = new ArrayList <Point> ();
 
         /***********************************************/
 
-        for (Point p : points) {
+        // OLD WAY
+
+        // coord init = new coord(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
+        // coord goal = new coord(Integer.parseInt(args[2]), Integer.parseInt(args[3]));
+
+        // Discrete dsc = new Discrete (40, 40);
+        // widthSearch wS = new widthSearch();
+
+        // wS.search(dsc.map, init, goal, 4);
+        // path = wS.getPath(dsc.map, init, goal, 4);
+        // // path = wS.getPath(dsc.map, goal, init, 4);
+
+        // for (coord p : path)
+        //     System.out.println(p.x() + " " + p.y());
+
+        // points = dsc.xyToMap(path, 40, 40);
+
+        // for (Point p : points)
+        //     System.out.println(p.x + " " + p.y);
+
+        /***********************************************/
+
+        // NEW WAY
+        widthSearch wS = new widthSearch();
+        boolean linearize = false;
+
+        path = wS.frenteDeOnda(40, points[0], points[10], linearize);
+        pointsPath = xyToMap(path, 40, 40);
+
+
+        for (Point p : pointsPath) {
             ret = master.sendCommand((byte) 0, (int) p.x/10, (int) p.y/10);
             Delay.msDelay(100);
 

@@ -55,6 +55,14 @@ public class Discrete {
         populateMap();
     }
 
+    public double get_w (){
+        return this.width;
+    }
+
+    public double get_h (){
+        return this.height;
+    }
+
     public void printMatrix(double[][] matrix) {
         for (int i = 0; i < matrix.length; i++) {
             for (int j = 0; j < matrix[i].length; j++) {

@@ -1,5 +1,7 @@
 import java.util.ArrayList;
 import java.util.Collections;
+import lejos.geom.*;
+
 /*
 
   Na matriz -2 indica a posicao inicial da busca, -1 obstaculos, 0 posicoes
@@ -11,8 +13,21 @@ import java.util.Collections;
 public class widthSearch {
 
     public widthSearch () {
-        
     }
+
+    private static Point[] points = {
+        new Point(100,813),    /* P1 */
+        new Point(428,873),   /* P2 */
+        new Point(1140,885),  /* P3 */
+        new Point(1117,432),  /* P4 */
+        new Point(830,507),   /* P5 */
+        new Point(690,571),   /* P6 */
+        new Point(450,593),   /* P7 */
+        new Point(263,350),   /* P8 */
+        new Point(531,382),   /* P9 */
+        new Point(986,166),    /* P10 */
+        new Point(490,100)     /* P11 */
+    };
 
     public static ArrayList <coord> getNeighbours(double[][] matrix, coord current, int connectivity) {
         ArrayList <coord> coordList = new ArrayList <coord> ();
@@ -229,11 +244,37 @@ public class widthSearch {
 
     }
 
-    public static ArrayList <coord> frenteDeOnda(int SR, coord init, coord goal, boolean linearize) {
+    public static coord wayPointToIndex(Discrete dsc, Point p) {
+        int M = dsc.map.length;
+        int N = dsc.map[0].length;
+
+        coord idx = new coord( (int) p.x/((int) dsc.get_w()),  (int) p.y/((int) dsc.get_h()) );
+
+        return idx;
+    }
+
+    public static void drawWayPoints(Discrete dsc) {
+        int M = dsc.map.length;
+        int N = dsc.map[0].length;
+        double RADIUS = (double) (M*N)/75000;
+        StdDraw.setPenRadius(RADIUS);
+        StdDraw.setPenColor(StdDraw.BLACK);
+
+        for (Point p : points) {
+            coord idx = wayPointToIndex(dsc, p);
+            StdDraw.point( ((double) idx.x())/((double) M) + RADIUS/2, ((double) idx.y())/((double) N) + RADIUS/2);
+        }
+    }
+
+    public static ArrayList <coord> frenteDeOnda(int SR, Point pointInit, Point pointGoal, boolean linearize) {
         ArrayList <coord> path = new ArrayList <coord> ();
         Discrete dsc = new Discrete (SR, SR);
 
+        coord init = wayPointToIndex(dsc, pointInit);
+        coord goal = wayPointToIndex(dsc, pointGoal);
+
         drawMatrix(dsc);
+        drawWayPoints(dsc);
         drawObjective(dsc, init, goal);
 
         search(dsc.map, goal, init, 4);
@@ -269,9 +310,12 @@ public class widthSearch {
 
         // drawMatrix(dsc);
 
-        coord init = new coord(0, 0);
-        coord goal = new coord(20, 12);
-        path = frenteDeOnda(40, init, goal, false);
+        // coord init = new coord(0, 0);
+        // coord goal = new coord(20, 12);
+
+
+        path = frenteDeOnda(40, points[0], points[10], false);
+
         // drawObjective(dsc, init, goal);
 
         // search(dsc.map, init, goal, 4);
