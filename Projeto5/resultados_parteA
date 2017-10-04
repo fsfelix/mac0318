@@ -1,0 +1,5 @@
+trajetoria = {1, 2, 6, 7, 8, 11, 10}; --> 2cm
+
+trajetoria = {1, 2, 3, 4, 10} --> 1cm
+
+trajetoria = {1, 2, 6, 5, 10}; --> 3cm

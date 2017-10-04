@@ -3,6 +3,9 @@
 // import lejos.robotics.mapping.LineMap;
 import java.util.Scanner;
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Iterator;
 // import lejos.util.Delay;
 
 public class Teste {
@@ -29,13 +32,15 @@ public class Teste {
         new Point(490,100)     /* P11 */
     };
 
+
     public static double distance(double x1, double y1, double x2, double y2) {
         return Math.sqrt(Math.pow(x1-x2, 2) + Math.pow(y1-y2, 2));
     }
 
     public static void main(String[] args) {
-        Graph graph = new Graph (11);
+        ArrayList <Integer> path = new ArrayList <Integer> ();
 
+        Graph graph = new Graph (11);
         graph.addBothEdges(0, 1, distance(points[0].x, points[0].y, points[1].x, points[1].y));
         graph.addBothEdges(1, 2, distance(points[1].x, points[1].y, points[2].x, points[2].y));
         graph.addBothEdges(2, 3, distance(points[2].x, points[2].y, points[3].x, points[3].y));
@@ -47,8 +52,17 @@ public class Teste {
         graph.addBothEdges(4, 9, distance(points[4].x, points[4].y, points[9].x, points[9].y));
         graph.addBothEdges(7, 10, distance(points[7].x, points[7].y, points[10].x, points[10].y));
         graph.addBothEdges(10, 9, distance(points[10].x, points[10].y, points[9].x, points[9].y));
-        graph.printGraph();
-        graph.Dijkstra(0, 10);
+        
+        path = graph.Dijkstra(0, 10);
+
+        int[] intArray = new int[path.size()];
+    
+        for (int i = 0; i < intArray.length; i++) {
+            intArray[i] = path.get(i) + 1;
+            System.out.println(intArray[i]);      
+        }        
+    
+
     }
 
 }

@@ -1,21 +1,21 @@
-import java.util.ArrayList;
 import lejos.pc.comm.*;
 import lejos.geom.*;
 import lejos.robotics.mapping.LineMap;
+import lejos.nxt.Button;
 import java.util.Scanner;
 import java.io.*;
 import lejos.util.Delay;
 
-public class RobotMain {
+public class MasterNav {
     private static final byte ADD_POINT = 0; //adds waypoint to path
     private static final byte TRAVEL_PATH = 1; // enables slave to execute the path
     private static final byte STATUS = 2; // enquires about slave's position 
     private static final byte STOP = 3; // closes communication
-	
+    
     private NXTComm nxtComm;
     private DataOutputStream dos;
-    private DataInputStream dis;	
-	
+    private DataInputStream dis;    
+    
     private static final String NXT_ID = "NXT15"; // NXT BRICK ID
 
     private static Point[] points = {
@@ -59,29 +59,29 @@ public class RobotMain {
 
     private void connect() {
         try {
-            NXTComm nxtComm = NXTCommFactory.createNXTComm(NXTCommFactory.USB);
+            // NXTComm nxtComm = NXTCommFactory.createNXTComm(NXTCommFactory.USB);
             /* Uncomment next line for Bluetooth communication */
-            // NXTComm nxtComm = NXTCommFactory.createNXTComm(NXTCommFactory.BLUETOOTH);			
+            NXTComm nxtComm = NXTCommFactory.createNXTComm(NXTCommFactory.BLUETOOTH);           
             NXTInfo[] nxtInfo = nxtComm.search(MasterNav.NXT_ID);
-			
+            
             if (nxtInfo.length == 0) {
                 System.err.println("NO NXT found");
                 System.exit(1);
             }
-			
+            
             if (!nxtComm.open(nxtInfo[0])) {
                 System.err.println("Failed to open NXT");
                 System.exit(1);
             }
-			
+            
             dis = new DataInputStream(nxtComm.getInputStream());
             dos = new DataOutputStream(nxtComm.getOutputStream());
-			
+            
         } catch (NXTCommException e) {
             System.err.println("NXTComm Exception: "  + e.getMessage());
             System.exit(1);
         }
-    }		
+    }       
 
     private void close() {
         try {
@@ -95,42 +95,59 @@ public class RobotMain {
             System.err.println("IO Exception");
         }
     }
+
+    public static int[] arrayListToArray(List<Integer> integers) {
+        
+        int[] v = new int[integers.size()];
+        Iterator<Integer> iterator = integers.iterator();
+        
+        for (int i = 0; i < v.length; i++) 
+            v[i] = iterator.next().intValue();
+        
+        return v;
+    }
+
+
     public static void main(String[] args) {
         byte cmd = 0; float param = 0f; float ret=0f; float addX = 0f; float addY = 0f; boolean boolRet = false;
         MasterNav master = new MasterNav();
         master.connect();
         Scanner scan = new Scanner( System.in );
 
-        /***********************************************/
+        ArrayList <Integer> path = new ArrayList <Integer> ();
 
-        ArrayList <coord> path = new ArrayList <coord> ();
-        ArrayList <Point> points = new ArrayList <Point> ();
+        Graph graph = new Graph (11);
+        graph.addBothEdges(0, 1, distance(points[0].x, points[0].y, points[1].x, points[1].y));
+        graph.addBothEdges(1, 2, distance(points[1].x, points[1].y, points[2].x, points[2].y));
+        graph.addBothEdges(2, 3, distance(points[2].x, points[2].y, points[3].x, points[3].y));
+        graph.addBothEdges(1, 5, distance(points[1].x, points[1].y, points[5].x, points[5].y));
+        graph.addBothEdges(5, 6, distance(points[5].x, points[5].y, points[6].x, points[6].y));
+        graph.addBothEdges(4, 5, distance(points[4].x, points[4].y, points[5].x, points[5].y));
+        graph.addBothEdges(3, 4, distance(points[3].x, points[3].y, points[4].x, points[4].y));
+        graph.addBothEdges(3, 9, distance(points[3].x, points[3].y, points[9].x, points[9].y));
+        graph.addBothEdges(4, 9, distance(points[4].x, points[4].y, points[9].x, points[9].y));
+        graph.addBothEdges(7, 10, distance(points[7].x, points[7].y, points[10].x, points[10].y));
+        graph.addBothEdges(10, 9, distance(points[10].x, points[10].y, points[9].x, points[9].y));
+        
+        path = graph.Dijkstra(0, 10);
 
-        coord init = new coord(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
-        coord goal = new coord(Integer.parseInt(args[2]), Integer.parseInt(args[3]));
+        int[] trajetoria = new int[path.size()];
+    
+        for (int i = 0; i < trajetoria.length; i++) {
+            trajetoria[i] = path.get(i) + 1;
+            System.out.println(trajetoria[i]);      
+        }        
 
-        Discrete dsc = new Discrete (40, 40);
-        widthSearch wS = new widthSearch();
 
-        wS.search(dsc.map, init, goal, 4);
-        // path = wS.getPath(dsc.map, init, goal, 4);
-        path = wS.getPath(dsc.map, goal, init, 4);
-
-        for (coord p : path)
-            System.out.println(p.x() + " " + p.y());
-
-        points = dsc.xyToMap(path, 40, 40);
-
-        for (Point p : points)
-            System.out.println(p.x + " " + p.y);
-
-        /***********************************************/
-
-        for (Point p : points) {
-            ret = master.sendCommand((byte) 0, (int) p.x/10, (int) p.y/10);
-            Delay.msDelay(100);
-
-        }
+        Button.waitForAnyPress();
+        master.sendCommand((byte) 3, points[trajetoria[0]-1].x/10, points[trajetoria[0]-1].y/10);
+        
+        for (int i = 0; i < trajetoria.length; i++)
+            {
+                ret = master.sendCommand((byte) 0, points[trajetoria[i] - 1].x/10, points[trajetoria[i] - 1].y/10);
+                Delay.msDelay(100);
+            }
+        
         ret = master.sendCommand((byte) 1, -1, -1);
         int num = scan.nextInt();
     }
