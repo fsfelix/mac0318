@@ -74,7 +74,6 @@ public class widthSearch {
             }
             System.out.println();
         }
-
     }
 
     public static void search(double[][] matrix, coord init, coord goal, int connectivity) {
@@ -217,7 +216,6 @@ public class widthSearch {
         }
     }
 
-
     public static void drawPath(Discrete dsc, ArrayList <coord> path) {
         int M = dsc.map.length;
         int N = dsc.map[0].length;
@@ -241,7 +239,6 @@ public class widthSearch {
 
         StdDraw.setPenColor(StdDraw.GREEN);
         StdDraw.point((double)goal.x()/(double)M + RADIUS/2, (double)goal.y()/N + RADIUS/2);
-
     }
 
     public static coord wayPointToIndex(Discrete dsc, Point p) {
@@ -282,8 +279,8 @@ public class widthSearch {
         Collections.reverse(path);
         drawPath(dsc, path);
 
-        for (coord p : path)
-            System.out.println(p.x() + " " + p.y());
+        //for (coord p : path)
+        //    System.out.println(p.x() + " " + p.y());
 
         if (linearize) {
             ArrayList <coord> newPath = new ArrayList <coord> ();
@@ -296,6 +293,14 @@ public class widthSearch {
         }
     }
 
+  /*  public static ArrayList <Point> resultInPoints (int SR, boolean linearize) {
+
+        ArrayList <coord> path = new ArrayList <coord> ();
+        path = frenteDeOnda(SR, points[0], points[10], linearize);
+
+        return my_dsc.xyToMap(path, SR, SR);
+    }
+*/
     public static void main(String[] args) {
         ArrayList <coord> path = new ArrayList <coord> ();
         ArrayList <coord> newPath = new ArrayList <coord> ();
