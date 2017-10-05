@@ -45,53 +45,162 @@ public class Visibility {
             map.add(l);
     }
 
-    public static void dilateLines(ArrayList <Line> map) {
-        float RATIO = (float) 1.5;
+    // public static void dilateLines(ArrayList <Line> map) {
+    //     float RATIO = (float) 1.5;
+    //     for (Line l : lines) {
+    //         Point p1 = l.getP1();
+    //         Point p1New = new Point(p1.x * RATIO, p1.y *RATIO);
+    //         Point p2 = l.getP2();
+    //         Point p2New = new Point(p2.x * RATIO, p2.y *RATIO);
+    //         float dist1 = (float) Math.sqrt( Math.pow(p1.x-p1New.x, 2) + Math.pow(p1.y - p1New.y, 2) );
+    //         float dist2 = (float) Math.sqrt( Math.pow(p2.x-p2New.x, 2) + Math.pow(p2.y - p2New.y, 2) );
+    //         double R = 20;
+
+    //         for (double y = p1.y - R; y <= p1.y + R; y += R)
+    //             for (double x = p1.x - R; x <= p1.x + R; x += R)
+    //                 for (double y2 = p2.y - R; y2 <= p2.y + R; y2 += R)
+    //                     for (double x2 = p2.x - R; x2 <= p2.x + R; x2 += R) {
+    //                         //System.out.println(y + " " + x + " " + y2 + " " + x2);
+    //                         Line tmp = new Line((float)x, (float)y, (float)x2, (float)y2);
+    //                         if (tmp.length() > l.length() && tmp.intersectsAt(l) == null)
+    //                             map.add(tmp);
+    //                     }
+    //         //map.add(new Line(p1.x * RATIO - dist1, p1.y * RATIO -dist1, p2.x * RATIO - dist2, p2.y * RATIO - dist2));
+    //     }
+    // }
+
+    public static float distance(Point a, Point b){
+        return (float) Math.sqrt(Math.pow( a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
+    }
+
+    public static void addWithCondition(Point a, ArrayList <Point> dilatedPoints, float eps) {
+        boolean add = true;
+        for (Point p : dilatedPoints) {
+            if (distance(p, a) < 5*eps) {
+                add = false;
+                break;
+            }
+        }
+        if (add)
+            dilatedPoints.add(a);
+    }
+
+    public static ArrayList <Point> dilatedPoints() {
+        ArrayList <Point> dilatedPoints = new ArrayList <Point>();
+
+        float eps = 10.0f;
+
         for (Line l : lines) {
+            l.lengthen(eps);
             Point p1 = l.getP1();
             Point p2 = l.getP2();
-            map.add(new Line(p1.x * RATIO, p1.y * RATIO, p2.x * RATIO, p2.y * RATIO));
+            float m = (p1.y - p2.y)/(p1.x - p2.x);
+
+            float b1 = p1.y + (1/m)*p1.x;
+            float b2 = p2.y + (1/m)*p2.x;
+
+            Line tmp1 = new Line(p1.x, p1.y, p1.x + eps/10, (p1.x + eps/10)*(-1/m) + b1);
+            tmp1.lengthen(eps);
+
+            Line tmp2 = new Line(p2.x, p2.y, p2.x + eps/10, (p2.x + eps/10)*(-1/m) + b2);
+            tmp2.lengthen(eps);
+
+            Point p3 = tmp1.getP1();
+            Point p4 = tmp1.getP2();
+
+            Point p5 = tmp2.getP1();
+            Point p6 = tmp2.getP2();
+
+            addWithCondition(p3, dilatedPoints, eps);
+            addWithCondition(p4, dilatedPoints, eps);
+            addWithCondition(p5, dilatedPoints, eps);
+            addWithCondition(p6, dilatedPoints, eps);
+
+            Line tmp3 = new Line(p3.x, p3.y, p5.x, p5.y);
+            Line tmp4 = new Line(p4.x, p4.y, p6.x, p6.y);
+
+            l.lengthen(-eps);
+            // map.add(l);
+            // map.add(tmp1);
+            // map.add(tmp2);
+            // map.add(tmp3);
+            // map.add(tmp4);
+
         }
+        return dilatedPoints;
     }
 
     public static ArrayList <Line> createMap() {
         ArrayList <Point> allPoints = getAllPoints();
         ArrayList <Point> linePoints = getLinePoints();
+        ArrayList <Point> dilatedPoints = getLinePoints();
+
         ArrayList <Line>  map = new ArrayList <Line> ();
 
         Point[] allPointsArray = new Point[allPoints.size()];
         allPointsArray = allPoints.toArray(allPointsArray);
-        addAllLines(map);
-        // dilateLines(map);
+        // addAllLines(map);
 
-        for (Point p1 : allPoints) {
-            System.out.println("all");
-            System.out.println(p1);
-            for (int i = 0; i < allPointsArray.length; i++) {
-                Point p2 = allPointsArray[i];
-                // System.out.println(i);
-                // System.out.println(allPointsArray.length);
-                if (!pointsAreEqual(p1, p2)) {
-                    float ratio = (float) 1.01;
-                    Line tmp = new Line(p1.x*ratio, p1.y*ratio, p2.x*ratio, p2.y*ratio);
+        dilatedPoints = dilatedPoints();
+        dilatedPoints.add(init);
+        dilatedPoints.add(goal);
+
+        Point[] dilatedPointsArray = new Point[dilatedPoints.size()];
+        dilatedPointsArray = dilatedPoints.toArray(dilatedPointsArray);
+
+
+        for (int i = 0; i < dilatedPoints.size(); i++) {
+            Point p1 = dilatedPointsArray[i];
+            for (int j = 0; j < dilatedPoints.size(); j++) {
+                if (i != j) {
+                    Point p2 = dilatedPointsArray[j];
                     boolean inters = false;
-
+                    Line tmp = new Line(p1.x, p1.y, p2.x, p2.y);
                     for (Line l : lines) {
                         if (l.intersectsAt(tmp) != null) {
                             inters = true;
                             break;
                         }
                     }
-
-                    if (!inters) {
-                        //System.out.println("Dentro do if");
-                        //System.out.println(tmp.x1 + " " + tmp.y1 + " " + tmp.x2 +  " " + tmp.y2);
-                        //Line newl = new Line();
+                    if (!inters)
                         map.add(tmp);
-                    }
                 }
             }
         }
+
+
+        // for (Point p1 : allPoints) {
+        //     System.out.println("all");
+        //     System.out.println(p1);
+
+        //     //            for (int i = 0; i < allPointsArray.length; i++) {
+        //     for (Line exp : map) {
+        //         Point p1 = exp.getP1();
+        //         Point p2 = exp.getP2();
+        //         //Point p2 = allPointsArray[i];
+        //         // System.out.println(i);
+        //         // System.out.println(allPointsArray.length);
+        //         if (!pointsAreEqual(p1, p2)) {
+        //             float ratio = (float) 1.01;
+        //             Line tmp = new Line(p1.x*ratio, p1.y*ratio, p2.x*ratio, p2.y*ratio);
+        //             boolean inters = false;
+
+        //             for (Line l : lines) {
+        //                 if (l.intersectsAt(tmp) != null) {
+        //                     inters = true;
+        //                     break;
+        //                 }
+        //             }
+
+        //             if (!inters) {
+        //                 //System.out.println("Dentro do if");
+        //                 //System.out.println(tmp.x1 + " " + tmp.y1 + " " + tmp.x2 +  " " + tmp.y2);
+        //                 //Line newl = new Line();
+        //                 map.add(tmp);
+        //             }
+        //         }
+        //     }
+        // }
 
         return map;
     }
@@ -133,9 +242,9 @@ public class Visibility {
         Visibility vsl = new Visibility(points[0], points[10], linesMap);
         map = vsl.createMap();
 
-        for (Line l : map) {
-            System.out.println(l.x1 + " " + l.y1 + " " + l.x2 +  " " + l.y2);
-        }
+        // for (Line l : map) {
+        //     System.out.println(l.x1 + " " + l.y1 + " " + l.x2 +  " " + l.y2);
+        // }
 
         Line[] mapRes = new Line[map.size()];
         mapRes = map.toArray(mapRes);
