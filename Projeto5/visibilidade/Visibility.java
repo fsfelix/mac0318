@@ -7,6 +7,11 @@ public class Visibility {
     public static Point init;
     public static Point goal;
     public static Line[] lines;
+    public static Graph graph;
+    public static ArrayList <Line> map;
+    public static ArrayList <Line> mapOriginal;
+    public static ArrayList <Line> mapDilated;
+    public static ArrayList <Point> pointsFinal;
 
     public Visibility (Point i, Point g, Line[] l) {
         this.init = i;
@@ -73,6 +78,27 @@ public class Visibility {
         return (float) Math.sqrt(Math.pow( a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
     }
 
+    public static int numberOfDistinctPoints(ArrayList <Line> lines) {
+        ArrayList <Point> points = new ArrayList <Point>();
+        for (Line l : lines) {
+            Point p1 = l.getP1();
+            Point p2 = l.getP2();
+            boolean p1Add = true;
+            boolean p2Add = true;
+            for (Point p : points) {
+                if (pointsAreEqual(p, p1))
+                    p1Add = false;
+                if (pointsAreEqual(p, p2))
+                    p2Add = false;
+            }
+            if (p1Add)
+                points.add(p1);
+            if (p2Add)
+                points.add(p2);
+        }
+        return points.size();
+    }
+
     public static void addWithCondition(Point a, ArrayList <Point> dilatedPoints, float eps) {
         boolean add = true;
         for (Point p : dilatedPoints) {
@@ -87,7 +113,8 @@ public class Visibility {
 
     public static ArrayList <Point> dilatedPoints() {
         ArrayList <Point> dilatedPoints = new ArrayList <Point>();
-
+        pointsFinal = new ArrayList <Point>();
+        mapDilated = new ArrayList <Line>();
         float eps = 10.0f;
 
         for (Line l : lines) {
@@ -120,22 +147,26 @@ public class Visibility {
             Line tmp4 = new Line(p4.x, p4.y, p6.x, p6.y);
 
             l.lengthen(-eps);
-            // map.add(l);
-            // map.add(tmp1);
-            // map.add(tmp2);
-            // map.add(tmp3);
-            // map.add(tmp4);
+            mapDilated.add(l);
+            mapDilated.add(tmp1);
+            mapDilated.add(tmp2);
+            mapDilated.add(tmp3);
+            mapDilated.add(tmp4);
 
         }
+
         return dilatedPoints;
     }
 
-    public static ArrayList <Line> createMap() {
+    public static void addToGraph(Point [] Points, int i, int j) {
+        graph.addBothEdges(i, j, (double) distance(Points[i], Points[j]));
+    }
+
+    public static void createMap() {
         ArrayList <Point> allPoints = getAllPoints();
         ArrayList <Point> linePoints = getLinePoints();
         ArrayList <Point> dilatedPoints = getLinePoints();
-
-        ArrayList <Line>  map = new ArrayList <Line> ();
+        map = new ArrayList <Line> ();
 
         Point[] allPointsArray = new Point[allPoints.size()];
         allPointsArray = allPoints.toArray(allPointsArray);
@@ -145,8 +176,13 @@ public class Visibility {
         dilatedPoints.add(init);
         dilatedPoints.add(goal);
 
+        for (Point p : dilatedPoints)
+            pointsFinal.add(p);
+
+
         Point[] dilatedPointsArray = new Point[dilatedPoints.size()];
         dilatedPointsArray = dilatedPoints.toArray(dilatedPointsArray);
+        graph = new Graph(dilatedPoints.size());
 
 
         for (int i = 0; i < dilatedPoints.size(); i++) {
@@ -162,47 +198,28 @@ public class Visibility {
                             break;
                         }
                     }
-                    if (!inters)
+                    if (!inters) {
                         map.add(tmp);
+                        addToGraph(dilatedPointsArray, i, j);
+                    }
                 }
             }
         }
 
+        //        return map;
+    }
 
-        // for (Point p1 : allPoints) {
-        //     System.out.println("all");
-        //     System.out.println(p1);
+    public static Point[] findPath() {
+        Visibility vsl = new Visibility(points[0], points[10], linesMap);
+        ArrayList <Point> path = new ArrayList <Point> ();
 
-        //     //            for (int i = 0; i < allPointsArray.length; i++) {
-        //     for (Line exp : map) {
-        //         Point p1 = exp.getP1();
-        //         Point p2 = exp.getP2();
-        //         //Point p2 = allPointsArray[i];
-        //         // System.out.println(i);
-        //         // System.out.println(allPointsArray.length);
-        //         if (!pointsAreEqual(p1, p2)) {
-        //             float ratio = (float) 1.01;
-        //             Line tmp = new Line(p1.x*ratio, p1.y*ratio, p2.x*ratio, p2.y*ratio);
-        //             boolean inters = false;
+        vsl.createMap();
 
-        //             for (Line l : lines) {
-        //                 if (l.intersectsAt(tmp) != null) {
-        //                     inters = true;
-        //                     break;
-        //                 }
-        //             }
+        int indInit = pointsFinal.size() - 2;
+        int indFinal = pointsFinal.size() - 1;
 
-        //             if (!inters) {
-        //                 //System.out.println("Dentro do if");
-        //                 //System.out.println(tmp.x1 + " " + tmp.y1 + " " + tmp.x2 +  " " + tmp.y2);
-        //                 //Line newl = new Line();
-        //                 map.add(tmp);
-        //             }
-        //         }
-        //     }
-        // }
+        path = graph.Dijkstra(indInit, indFinal);
 
-        return map;
     }
 
     public static void main(String[] args) {
@@ -237,23 +254,41 @@ public class Visibility {
             new Point(986,166),    /* P10 */
             new Point(490,100)     /* P11 */
         };
-        ArrayList <Line>  map = new ArrayList <Line> ();
+        //ArrayList <Line>  map = new ArrayList <Line> ();
 
         Visibility vsl = new Visibility(points[0], points[10], linesMap);
-        map = vsl.createMap();
-
+        //map = vsl.createMap();
+        vsl.createMap();
         // for (Line l : map) {
         //     System.out.println(l.x1 + " " + l.y1 + " " + l.x2 +  " " + l.y2);
         // }
+
+        graph.printGraph();
+
+        int indInit = pointsFinal.size() - 2;
+        int indFinal = pointsFinal.size() - 1;
+
+        graph.Dijkstra(indInit, indFinal);
+
+        System.out.println(graph.size());
 
         Line[] mapRes = new Line[map.size()];
         mapRes = map.toArray(mapRes);
 
         Rectangle bounds = new Rectangle(0, 0, 1195, 920);
         LineMap mymap = new LineMap(mapRes, bounds);
+
+        Line[] mapDilatedArray = new Line[mapDilated.size()];
+        mapDilatedArray = mapDilated.toArray(mapDilatedArray);
+
+        LineMap mapDilatedLineMap = new LineMap(mapDilatedArray, bounds);
+
         try{
             mymap.createSVGFile("mapa.svg");
             mymap.flip().createSVGFile("mapaFlipY.svg"); //creates a fliped version in the Y-axis of the orginal image
+            mapDilatedLineMap.createSVGFile("mapaDilatado.svg");
+            mapDilatedLineMap.flip().createSVGFile("mapaDilatadoFlip.svg"); //creates a fliped version in the Y-axis of the orginal image
+
         }catch (Exception e){
             System.out.print("Exception caught: ");
             System.out.println(e.getMessage());
