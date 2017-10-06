@@ -118,7 +118,7 @@ public class Visibility {
     public static void addWithCondition(Point a, ArrayList <Point> dilatedPoints, float eps) {
         boolean add = true;
         for (Point p : dilatedPoints) {
-            if (distance(p, a) < 5*eps) {
+            if (distance(p, a) < 2*eps) {
                 add = false;
                 break;
             }
@@ -263,19 +263,19 @@ public class Visibility {
         };
         //ArrayList <Line>  map = new ArrayList <Line> ();
 
-        Visibility vsl = new Visibility(points[0], points[9], linesMap);
-        //map = vsl.createMap();
+        Visibility vsl = new Visibility(points[10], points[0], linesMap);
+        // map = vsl.createMap();
         vsl.createMap();
         // for (Line l : map) {
         //     System.out.println(l.x1 + " " + l.y1 + " " + l.x2 +  " " + l.y2);
         // }
 
-        graph.printGraph();
+        // graph.printGraph();
 
-        int indInit = pointsFinal.size() - 2;
+        int indInit  = pointsFinal.size() - 2;
         int indFinal = pointsFinal.size() - 1;
 
-        graph.Dijkstra(indInit, indFinal);
+        // graph.Dijkstra(indInit, indFinal);
 
         Line[] mapRes = new Line[map.size()];
         mapRes = map.toArray(mapRes);

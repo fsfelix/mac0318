@@ -61,9 +61,9 @@ public class MasterNav {
 
     private void connect() {
         try {
-            // NXTComm nxtComm = NXTCommFactory.createNXTComm(NXTCommFactory.USB);
+            NXTComm nxtComm = NXTCommFactory.createNXTComm(NXTCommFactory.USB);
             /* Uncomment next line for Bluetooth communication */
-            NXTComm nxtComm = NXTCommFactory.createNXTComm(NXTCommFactory.BLUETOOTH);           
+            // NXTComm nxtComm = NXTCommFactory.createNXTComm(NXTCommFactory.BLUETOOTH);           
             NXTInfo[] nxtInfo = nxtComm.search(MasterNav.NXT_ID);
             
             if (nxtInfo.length == 0) {
@@ -107,7 +107,7 @@ public class MasterNav {
 
         /*******************************************************************************************************/
 
-        int SR = 40;
+        int SR = 50;
         boolean linearize = true;
 
         ArrayList <coord> path = new ArrayList <coord> ();
@@ -115,7 +115,7 @@ public class MasterNav {
         Discrete dsc = new Discrete (SR, SR);
 
         widthSearch wS = new widthSearch();
-        path = wS.frenteDeOnda(SR, points[0], points[9], linearize);
+        path = wS.frenteDeOnda(SR, points[10], points[0], linearize);
 
         finalPoints = dsc.xyToMap(path, SR, SR);
 

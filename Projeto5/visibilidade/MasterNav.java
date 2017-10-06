@@ -1,12 +1,13 @@
-import java.util.ArrayList;
-import java.util.List;
 import lejos.pc.comm.*;
 import lejos.geom.*;
 import lejos.robotics.mapping.LineMap;
 import lejos.nxt.Button;
+import lejos.util.Delay;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.io.*;
-import lejos.util.Delay;
 
 public class MasterNav {
     private static final byte ADD_POINT = 0; //adds waypoint to path
@@ -78,9 +79,9 @@ public class MasterNav {
 
     private void connect() {
         try {
-            // NXTComm nxtComm = NXTCommFactory.createNXTComm(NXTCommFactory.USB);
+            NXTComm nxtComm = NXTCommFactory.createNXTComm(NXTCommFactory.USB);
             /* Uncomment next line for Bluetooth communication */
-            NXTComm nxtComm = NXTCommFactory.createNXTComm(NXTCommFactory.BLUETOOTH);           
+            // NXTComm nxtComm = NXTCommFactory.createNXTComm(NXTCommFactory.BLUETOOTH);           
             NXTInfo[] nxtInfo = nxtComm.search(MasterNav.NXT_ID);
             
             if (nxtInfo.length == 0) {

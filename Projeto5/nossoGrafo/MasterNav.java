@@ -5,6 +5,8 @@ import lejos.nxt.Button;
 import java.util.Scanner;
 import java.io.*;
 import lejos.util.Delay;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MasterNav {
     private static final byte ADD_POINT = 0; //adds waypoint to path
@@ -59,9 +61,9 @@ public class MasterNav {
 
     private void connect() {
         try {
-            // NXTComm nxtComm = NXTCommFactory.createNXTComm(NXTCommFactory.USB);
+            NXTComm nxtComm = NXTCommFactory.createNXTComm(NXTCommFactory.USB);
             /* Uncomment next line for Bluetooth communication */
-            NXTComm nxtComm = NXTCommFactory.createNXTComm(NXTCommFactory.BLUETOOTH);           
+            // NXTComm nxtComm = NXTCommFactory.createNXTComm(NXTCommFactory.BLUETOOTH);           
             NXTInfo[] nxtInfo = nxtComm.search(MasterNav.NXT_ID);
             
             if (nxtInfo.length == 0) {
@@ -96,18 +98,20 @@ public class MasterNav {
         }
     }
 
-    public static int[] arrayListToArray(List<Integer> integers) {
+    // public static int[] arrayListToArray(List<Integer> integers) {
         
-        int[] v = new int[integers.size()];
-        Iterator<Integer> iterator = integers.iterator();
+    //     int[] v = new int[integers.size()];
+    //     Iterator<Integer> iterator = integers.iterator();
         
-        for (int i = 0; i < v.length; i++) 
-            v[i] = iterator.next().intValue();
+    //     for (int i = 0; i < v.length; i++) 
+    //         v[i] = iterator.next().intValue();
         
-        return v;
+    //     return v;
+    // }
+
+    public static float distance (double x1, double y1, double x2, double y2) {
+        return (float) Math.sqrt(Math.pow(x1-x2, 2) + Math.pow(y1-y2, 2));
     }
-
-
     public static void main(String[] args) {
         byte cmd = 0; float param = 0f; float ret=0f; float addX = 0f; float addY = 0f; boolean boolRet = false;
         MasterNav master = new MasterNav();
@@ -129,7 +133,7 @@ public class MasterNav {
         graph.addBothEdges(7, 10, distance(points[7].x, points[7].y, points[10].x, points[10].y));
         graph.addBothEdges(10, 9, distance(points[10].x, points[10].y, points[9].x, points[9].y));
         
-        path = graph.Dijkstra(0, 10);
+        path = graph.Dijkstra(10, 0);
 
         int[] trajetoria = new int[path.size()];
     
