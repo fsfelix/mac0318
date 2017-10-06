@@ -12,6 +12,22 @@ public class Visibility {
     public static ArrayList <Line> mapOriginal;
     public static ArrayList <Line> mapDilated;
     public static ArrayList <Point> pointsFinal;
+    public static Line[] linesMap = {
+        new Line(170,437,60,680),
+        new Line(60,680,398,800),
+        new Line(398,800,450,677),
+        new Line(450,677,235,595),
+        new Line(235,595,281,472),
+        new Line(281,472,170,437),
+        new Line(1070,815,770,602),
+        new Line(770,602,1060,516),
+        new Line(1070,815,1060,516),
+        new Line(335,345,502,155),
+        new Line(502,155,700,225),
+        new Line(700,225, 725,490),
+        new Line(725,490,480,525),
+        new Line(480,525,335,345),
+    };
 
     public Visibility (Point i, Point g, Line[] l) {
         this.init = i;
@@ -209,9 +225,10 @@ public class Visibility {
         //        return map;
     }
 
-    public static Point[] findPath() {
-        Visibility vsl = new Visibility(points[0], points[10], linesMap);
-        ArrayList <Point> path = new ArrayList <Point> ();
+    public static ArrayList <Point> findPath() {
+        Visibility vsl = new Visibility(init, goal, linesMap);
+        ArrayList <Integer> path = new ArrayList <Integer> ();
+        ArrayList <Point> pathPoints = new ArrayList <Point> ();
 
         vsl.createMap();
 
@@ -220,26 +237,16 @@ public class Visibility {
 
         path = graph.Dijkstra(indInit, indFinal);
 
+        for (int i : path)
+            pathPoints.add(pointsFinal.get(i));
+
+        // Point[] pathArray = new Point[pathPoints.size()];
+        // pathArray = pathPoints.toArray(pathArray);
+
+        return pathPoints;
     }
 
     public static void main(String[] args) {
-        Line[] linesMap = {
-            new Line(170,437,60,680),
-            new Line(60,680,398,800),
-            new Line(398,800,450,677),
-            new Line(450,677,235,595),
-            new Line(235,595,281,472),
-            new Line(281,472,170,437),
-            new Line(1070,815,770,602),
-            new Line(770,602,1060,516),
-            new Line(1070,815,1060,516),
-            new Line(335,345,502,155),
-            new Line(502,155,700,225),
-            new Line(700,225, 725,490),
-            new Line(725,490,480,525),
-            new Line(480,525,335,345),
-
-        };
 
         Point[] points = {
             new Point(100,813),    /* P1 */
@@ -256,7 +263,7 @@ public class Visibility {
         };
         //ArrayList <Line>  map = new ArrayList <Line> ();
 
-        Visibility vsl = new Visibility(points[0], points[10], linesMap);
+        Visibility vsl = new Visibility(points[0], points[9], linesMap);
         //map = vsl.createMap();
         vsl.createMap();
         // for (Line l : map) {
@@ -269,8 +276,6 @@ public class Visibility {
         int indFinal = pointsFinal.size() - 1;
 
         graph.Dijkstra(indInit, indFinal);
-
-        System.out.println(graph.size());
 
         Line[] mapRes = new Line[map.size()];
         mapRes = map.toArray(mapRes);

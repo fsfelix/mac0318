@@ -20,6 +20,8 @@ public class Graph {
 
     public void addEdge(int v, int w, double weight) {
         nodes[v].edges.add(new DirectedEdge(v, w, weight));
+        nodes[v].degree++;
+        nodes[w].degree++;
     }
 
     public void addBothEdges(int v, int w, double weight) {
@@ -49,6 +51,7 @@ public class Graph {
                 min = array[e];
                 ind = e;
             }
+
         }
 
         return ind;
@@ -64,11 +67,11 @@ public class Graph {
         for (int v = 0; v < this.V; v++) {
             distTo[v] = Double.POSITIVE_INFINITY;
             prev[v] = -1;
-            nodeSet.add(v);
+            if (nodes[v].degree > 0)
+                nodeSet.add(v);
         }
 
         distTo[s] = 0;
-        nodeSet.remove(Integer.valueOf(4));
 
         while (!nodeSet.isEmpty()) {
             int u = indMin(distTo, nodeSet);
