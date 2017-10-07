@@ -1,5 +1,6 @@
 import java.util.*;
 import java.util.ArrayList;
+import java.util.PriorityQueue;
 
 public class Graph {
     private int V;
@@ -40,6 +41,8 @@ public class Graph {
         double min = Double.POSITIVE_INFINITY;
         int ind = 0;
 
+
+
         for (int e : nodeSet) {
             if (array[e] < min) {
                 min = array[e];
@@ -56,20 +59,39 @@ public class Graph {
         double [] distTo = new double[this.V];
         int [] prev = new int[this.V];
         ArrayList <Integer> nodeSet = new ArrayList <Integer> ();
+        PriorityQueue <Integer> pq = new PriorityQueue <Integer> (this.V,
+                                                                  new Comparator<Integer> () {
+                                                                      public int compare(Integer a, Integer b) {
+                                                                          if (distTo[a] > distTo[b])
+                                                                              return 1;
+                                                                          if (distTo[a] < distTo[b])
+                                                                              return -1;
+                                                                          return 0;
+                                                                      }
+                                                                  });
 
         for (int v = 0; v < this.V; v++) {
             distTo[v] = Double.POSITIVE_INFINITY;
             prev[v] = -1;
-            nodeSet.add(v);
+            //nodeSet.add(v);
+            pq.add(v);
         }
 
         distTo[s] = 0;
-        nodeSet.remove(Integer.valueOf(8));
+        // nodeSet.remove(Integer.valueOf(8));
 
-        while (!nodeSet.isEmpty()) {
-            int u = indMin(distTo, nodeSet);
+        //        while (!nodeSet.isEmpty()) {
+        while (pq.size() > 0) {
+            //int u = indMin(distTo, nodeSet);
+            int u = pq.poll();
 
-            nodeSet.remove(Integer.valueOf(u));
+        System.out.println("u do indmin: " + u);
+        System.out.println(nodeSet.size());
+
+            // nodeSet.remove(new Integer(u));
+
+            System.out.println("u do indmin: " + u);
+            System.out.println(nodeSet.size());
 
             Iterator itr = this.nodes[u].edges.iterator();
             while (itr.hasNext()) {
@@ -82,6 +104,10 @@ public class Graph {
                     distTo[v] = new_dist;
                     prev[v] = u;
                 }
+            }
+
+            for (int e : nodeSet){
+                System.out.println("O QUE TEM NA FILA:" + e + " " + distTo[e]);
             }
         }
 
