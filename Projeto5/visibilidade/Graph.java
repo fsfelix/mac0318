@@ -1,5 +1,6 @@
 import java.util.*;
 import java.util.ArrayList;
+import java.util.PriorityQueue;
 
 public class Graph {
     private int V;
@@ -14,14 +15,8 @@ public class Graph {
         }
     }
 
-    public int size() {
-        return this.V;
-    }
-
     public void addEdge(int v, int w, double weight) {
         nodes[v].edges.add(new DirectedEdge(v, w, weight));
-        nodes[v].degree++;
-        nodes[w].degree++;
     }
 
     public void addBothEdges(int v, int w, double weight) {
@@ -38,6 +33,7 @@ public class Graph {
                 System.out.println("From: " + edge.from());
                 System.out.println("To: " + edge.to());
                 System.out.println("Weight: " + edge.weight());
+                System.out.println();
             }
         }
     }
@@ -46,54 +42,55 @@ public class Graph {
         double min = Double.POSITIVE_INFINITY;
         int ind = 0;
 
+
+
         for (int e : nodeSet) {
             if (array[e] < min) {
                 min = array[e];
                 ind = e;
             }
-
         }
 
         return ind;
     }
 
-
     // s: source vertex
     public ArrayList<Integer> Dijkstra(int s, int target) {
         double [] distTo = new double[this.V];
         int [] prev = new int[this.V];
-        ArrayList <Integer> nodeSet = new ArrayList <Integer> ();
+        PriorityQueue <Integer> pq = new PriorityQueue <Integer> (this.V,
+                                                                  new Comparator<Integer> () {
+                                                                      public int compare(Integer a, Integer b) {
+                                                                          if (distTo[a] > distTo[b])
+                                                                              return 1;
+                                                                          if (distTo[a] < distTo[b])
+                                                                              return -1;
+                                                                          return 0;
+                                                                      }
+                                                                  });
 
         for (int v = 0; v < this.V; v++) {
             distTo[v] = Double.POSITIVE_INFINITY;
             prev[v] = -1;
-            if (nodes[v].degree > 0)
-                nodeSet.add(v);
+            pq.add(v);
         }
 
         distTo[s] = 0;
 
-        while (!nodeSet.isEmpty()) {
-            int u = indMin(distTo, nodeSet);
+        while (pq.size() > 0) {
+            int u = pq.poll();
 
-            nodeSet.remove(Integer.valueOf(u));
-
-            Iterator itr = this.nodes[u].edges.iterator();
-            while (itr.hasNext()) {
-                Object element = itr.next();
-                DirectedEdge edge = (DirectedEdge) element;
+            for (DirectedEdge edge : this.nodes[u].edges) {
                 double new_dist = distTo[u] + edge.weight();
-
                 int v = edge.to();
                 if (new_dist < distTo[v]) {
                     distTo[v] = new_dist;
                     prev[v] = u;
-                }
-                for (int i : nodeSet) {
-                    System.out.println(i);
-                    System.out.println(distTo[i]);
+                    pq.remove(v);
+                    pq.add(v);
                 }
             }
+
         }
 
         ArrayList <Integer> path = new ArrayList <Integer> ();

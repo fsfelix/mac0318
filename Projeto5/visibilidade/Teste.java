@@ -36,7 +36,7 @@ public class Teste {
             new Line(480,525,335,345),
         };
 
-        Visibility vsl = new Visibility(points[0], points[9], linesMap);
+        Visibility vsl = new Visibility(points[0], points[10], linesMap);
         ArrayList <Point> pointsRes = new ArrayList <Point> ();
         pointsRes = vsl.findPath();
 

@@ -266,7 +266,8 @@ public class widthSearch {
     public static ArrayList <coord> frenteDeOnda(int SR, Point pointInit, Point pointGoal, boolean linearize) {
         ArrayList <coord> path = new ArrayList <coord> ();
         Discrete dsc = new Discrete (SR, SR);
-
+        // descomente se quiser a versão com o mapa dilatado:
+        // dsc.thicken();
         coord init = wayPointToIndex(dsc, pointInit);
         coord goal = wayPointToIndex(dsc, pointGoal);
 

@@ -33,6 +33,7 @@ public class Graph {
                 System.out.println("From: " + edge.from());
                 System.out.println("To: " + edge.to());
                 System.out.println("Weight: " + edge.weight());
+                System.out.println();
             }
         }
     }
@@ -53,12 +54,10 @@ public class Graph {
         return ind;
     }
 
-
     // s: source vertex
     public ArrayList<Integer> Dijkstra(int s, int target) {
         double [] distTo = new double[this.V];
         int [] prev = new int[this.V];
-        ArrayList <Integer> nodeSet = new ArrayList <Integer> ();
         PriorityQueue <Integer> pq = new PriorityQueue <Integer> (this.V,
                                                                   new Comparator<Integer> () {
                                                                       public int compare(Integer a, Integer b) {
@@ -73,42 +72,25 @@ public class Graph {
         for (int v = 0; v < this.V; v++) {
             distTo[v] = Double.POSITIVE_INFINITY;
             prev[v] = -1;
-            //nodeSet.add(v);
             pq.add(v);
         }
 
         distTo[s] = 0;
-        // nodeSet.remove(Integer.valueOf(8));
 
-        //        while (!nodeSet.isEmpty()) {
         while (pq.size() > 0) {
-            //int u = indMin(distTo, nodeSet);
             int u = pq.poll();
 
-        System.out.println("u do indmin: " + u);
-        System.out.println(nodeSet.size());
-
-            // nodeSet.remove(new Integer(u));
-
-            System.out.println("u do indmin: " + u);
-            System.out.println(nodeSet.size());
-
-            Iterator itr = this.nodes[u].edges.iterator();
-            while (itr.hasNext()) {
-                Object element = itr.next();
-                DirectedEdge edge = (DirectedEdge) element;
+            for (DirectedEdge edge : this.nodes[u].edges) {
                 double new_dist = distTo[u] + edge.weight();
-
                 int v = edge.to();
                 if (new_dist < distTo[v]) {
                     distTo[v] = new_dist;
                     prev[v] = u;
+                    pq.remove(v);
+                    pq.add(v);
                 }
             }
 
-            for (int e : nodeSet){
-                System.out.println("O QUE TEM NA FILA:" + e + " " + distTo[e]);
-            }
         }
 
         ArrayList <Integer> path = new ArrayList <Integer> ();

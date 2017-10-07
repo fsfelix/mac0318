@@ -41,27 +41,27 @@ public class Teste {
         ArrayList <Integer> path = new ArrayList <Integer> ();
 
         Graph graph = new Graph (11);
-        graph.addBothEdges(0, 1, distance(points[0].x, points[0].y, points[1].x, points[1].y));
-        graph.addBothEdges(1, 2, distance(points[1].x, points[1].y, points[2].x, points[2].y));
-        graph.addBothEdges(2, 3, distance(points[2].x, points[2].y, points[3].x, points[3].y));
-        graph.addBothEdges(1, 5, distance(points[1].x, points[1].y, points[5].x, points[5].y));
-        graph.addBothEdges(5, 6, distance(points[5].x, points[5].y, points[6].x, points[6].y));
-        graph.addBothEdges(4, 5, distance(points[4].x, points[4].y, points[5].x, points[5].y));
-        graph.addBothEdges(3, 4, distance(points[3].x, points[3].y, points[4].x, points[4].y));
-        graph.addBothEdges(3, 9, distance(points[3].x, points[3].y, points[9].x, points[9].y));
-        graph.addBothEdges(4, 9, distance(points[4].x, points[4].y, points[9].x, points[9].y));
+        graph.addBothEdges(0, 1,  distance(points[0].x, points[0].y, points[1].x, points[1].y));
+        graph.addBothEdges(1, 2,  distance(points[1].x, points[1].y, points[2].x, points[2].y));
+        graph.addBothEdges(2, 3,  distance(points[2].x, points[2].y, points[3].x, points[3].y));
+        graph.addBothEdges(1, 5,  distance(points[1].x, points[1].y, points[5].x, points[5].y));
+        graph.addBothEdges(5, 6,  distance(points[5].x, points[5].y, points[6].x, points[6].y));
+        graph.addBothEdges(4, 5,  distance(points[4].x, points[4].y, points[5].x, points[5].y));
+        graph.addBothEdges(3, 4,  distance(points[3].x, points[3].y, points[4].x, points[4].y));
+        graph.addBothEdges(3, 9,  distance(points[3].x, points[3].y, points[9].x, points[9].y));
+        graph.addBothEdges(4, 9,  distance(points[4].x, points[4].y, points[9].x, points[9].y));
         graph.addBothEdges(7, 10, distance(points[7].x, points[7].y, points[10].x, points[10].y));
         graph.addBothEdges(10, 9, distance(points[10].x, points[10].y, points[9].x, points[9].y));
 
-        path = graph.Dijkstra(0, 3);
-
+        graph.printGraph();
+        path = graph.Dijkstra(0, 9);
+        
         int[] intArray = new int[path.size()];
-    
+
         for (int i = 0; i < intArray.length; i++) {
             intArray[i] = path.get(i) + 1;
-            System.out.println(intArray[i]);      
-        }        
-    
+            System.out.println(intArray[i]);
+        }
 
     }
 
