@@ -131,7 +131,7 @@ public class Visibility {
         ArrayList <Point> dilatedPoints = new ArrayList <Point>();
         pointsFinal = new ArrayList <Point>();
         mapDilated = new ArrayList <Line>();
-        float eps = 10.0f;
+        float eps = 20.0f;
 
         for (Line l : lines) {
             l.lengthen(eps);
@@ -246,7 +246,19 @@ public class Visibility {
         return pathPoints;
     }
 
+    public static void drawDilatedMap(Line[] mapDilatedArray) {
+        StdDraw.setPenRadius(0.005);
+        StdDraw.setPenColor(StdDraw.BLUE);
+        for (Line l : mapDilatedArray) {
+            Point P1 = l.getP1();
+            Point P2 = l.getP2();
+            StdDraw.line((double) P1.x/1195, (double) P1.y/920, (double) P2.x/1195, (double) P2.y/920);
+        }
+
+    }
     public static void main(String[] args) {
+        ArrayList <Integer> path = new ArrayList <Integer> ();
+        ArrayList <Point> pathPoints = new ArrayList <Point> ();
 
         Point[] points = {
             new Point(100,813),    /* P1 */
@@ -261,21 +273,16 @@ public class Visibility {
             new Point(986,166),    /* P10 */
             new Point(490,100)     /* P11 */
         };
-        //ArrayList <Line>  map = new ArrayList <Line> ();
 
-        Visibility vsl = new Visibility(points[10], points[0], linesMap);
-        // map = vsl.createMap();
+        // P11 para o P1
+        // Visibility vsl = new Visibility(points[10], points[0], linesMap);
+        // P1 ao P10
+        Visibility vsl = new Visibility(points[0], points[9], linesMap);
+
         vsl.createMap();
-        // for (Line l : map) {
-        //     System.out.println(l.x1 + " " + l.y1 + " " + l.x2 +  " " + l.y2);
-        // }
-
-        // graph.printGraph();
 
         int indInit  = pointsFinal.size() - 2;
         int indFinal = pointsFinal.size() - 1;
-
-        // graph.Dijkstra(indInit, indFinal);
 
         Line[] mapRes = new Line[map.size()];
         mapRes = map.toArray(mapRes);
@@ -285,6 +292,35 @@ public class Visibility {
 
         Line[] mapDilatedArray = new Line[mapDilated.size()];
         mapDilatedArray = mapDilated.toArray(mapDilatedArray);
+
+
+        StdDraw.setCanvasSize(1195, 920);
+
+        drawDilatedMap(mapDilatedArray);
+
+        path = graph.Dijkstra(indInit, indFinal);
+
+        for (int i : path)
+            pathPoints.add(pointsFinal.get(i));
+
+        StdDraw.setPenRadius(0.05);
+        Point init = pathPoints.get(0);
+        Point end = pathPoints.get(pathPoints.size() - 1);
+
+        StdDraw.setPenColor(StdDraw.BLUE);
+        StdDraw.point((double) init.x/1195, (double)init.y/920);
+        StdDraw.setPenColor(StdDraw.GREEN);
+        StdDraw.point((double) end.x/1195, (double)end.y/920);
+
+        StdDraw.setPenRadius(0.005);
+        StdDraw.setPenColor(StdDraw.RED);
+
+        for (int i = 0; i < pathPoints.size() - 1; i++) {
+            Point P1 = pathPoints.get(i);
+            Point P2 = pathPoints.get(i + 1);
+            StdDraw.line((double) P1.x/1195, (double) P1.y/920, (double) P2.x/1195, (double) P2.y/920);
+
+        }
 
         LineMap mapDilatedLineMap = new LineMap(mapDilatedArray, bounds);
 

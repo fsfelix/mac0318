@@ -66,6 +66,30 @@ public class Visibility {
             map.add(l);
     }
 
+    // public static void dilateLines(ArrayList <Line> map) {
+    //     float RATIO = (float) 1.5;
+    //     for (Line l : lines) {
+    //         Point p1 = l.getP1();
+    //         Point p1New = new Point(p1.x * RATIO, p1.y *RATIO);
+    //         Point p2 = l.getP2();
+    //         Point p2New = new Point(p2.x * RATIO, p2.y *RATIO);
+    //         float dist1 = (float) Math.sqrt( Math.pow(p1.x-p1New.x, 2) + Math.pow(p1.y - p1New.y, 2) );
+    //         float dist2 = (float) Math.sqrt( Math.pow(p2.x-p2New.x, 2) + Math.pow(p2.y - p2New.y, 2) );
+    //         double R = 20;
+
+    //         for (double y = p1.y - R; y <= p1.y + R; y += R)
+    //             for (double x = p1.x - R; x <= p1.x + R; x += R)
+    //                 for (double y2 = p2.y - R; y2 <= p2.y + R; y2 += R)
+    //                     for (double x2 = p2.x - R; x2 <= p2.x + R; x2 += R) {
+    //                         //System.out.println(y + " " + x + " " + y2 + " " + x2);
+    //                         Line tmp = new Line((float)x, (float)y, (float)x2, (float)y2);
+    //                         if (tmp.length() > l.length() && tmp.intersectsAt(l) == null)
+    //                             map.add(tmp);
+    //                     }
+    //         //map.add(new Line(p1.x * RATIO - dist1, p1.y * RATIO -dist1, p2.x * RATIO - dist2, p2.y * RATIO - dist2));
+    //     }
+    // }
+
     public static float distance(Point a, Point b){
         return (float) Math.sqrt(Math.pow( a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
     }
@@ -107,7 +131,7 @@ public class Visibility {
         ArrayList <Point> dilatedPoints = new ArrayList <Point>();
         pointsFinal = new ArrayList <Point>();
         mapDilated = new ArrayList <Line>();
-        float eps = 10.0f;
+        float eps = 20.0f;
 
         for (Line l : lines) {
             l.lengthen(eps);
@@ -162,6 +186,7 @@ public class Visibility {
 
         Point[] allPointsArray = new Point[allPoints.size()];
         allPointsArray = allPoints.toArray(allPointsArray);
+        // addAllLines(map);
 
         dilatedPoints = dilatedPoints();
         dilatedPoints.add(init);
@@ -197,6 +222,7 @@ public class Visibility {
             }
         }
 
+        //        return map;
     }
 
     public static ArrayList <Point> findPath() {
@@ -220,7 +246,19 @@ public class Visibility {
         return pathPoints;
     }
 
+    public static void drawDilatedMap(Line[] mapDilatedArray) {
+        StdDraw.setPenRadius(0.005);
+        StdDraw.setPenColor(StdDraw.BLUE);
+        for (Line l : mapDilatedArray) {
+            Point P1 = l.getP1();
+            Point P2 = l.getP2();
+            StdDraw.line((double) P1.x/1195, (double) P1.y/920, (double) P2.x/1195, (double) P2.y/920);
+        }
+
+    }
     public static void main(String[] args) {
+        ArrayList <Integer> path = new ArrayList <Integer> ();
+        ArrayList <Point> pathPoints = new ArrayList <Point> ();
 
         Point[] points = {
             new Point(100,813),    /* P1 */
@@ -235,21 +273,16 @@ public class Visibility {
             new Point(986,166),    /* P10 */
             new Point(490,100)     /* P11 */
         };
-        //ArrayList <Line>  map = new ArrayList <Line> ();
 
-        Visibility vsl = new Visibility(points[10], points[0], linesMap);
-        // map = vsl.createMap();
+        // P11 para o P1
+        // Visibility vsl = new Visibility(points[10], points[0], linesMap);
+        // P1 ao P10
+        Visibility vsl = new Visibility(points[0], points[9], linesMap);
+
         vsl.createMap();
-        // for (Line l : map) {
-        //     System.out.println(l.x1 + " " + l.y1 + " " + l.x2 +  " " + l.y2);
-        // }
-
-        // graph.printGraph();
 
         int indInit  = pointsFinal.size() - 2;
         int indFinal = pointsFinal.size() - 1;
-
-        // graph.Dijkstra(indInit, indFinal);
 
         Line[] mapRes = new Line[map.size()];
         mapRes = map.toArray(mapRes);
@@ -259,6 +292,35 @@ public class Visibility {
 
         Line[] mapDilatedArray = new Line[mapDilated.size()];
         mapDilatedArray = mapDilated.toArray(mapDilatedArray);
+
+
+        StdDraw.setCanvasSize(1195, 920);
+
+        drawDilatedMap(mapDilatedArray);
+
+        path = graph.Dijkstra(indInit, indFinal);
+
+        for (int i : path)
+            pathPoints.add(pointsFinal.get(i));
+
+        StdDraw.setPenRadius(0.05);
+        Point init = pathPoints.get(0);
+        Point end = pathPoints.get(pathPoints.size() - 1);
+
+        StdDraw.setPenColor(StdDraw.BLUE);
+        StdDraw.point((double) init.x/1195, (double)init.y/920);
+        StdDraw.setPenColor(StdDraw.GREEN);
+        StdDraw.point((double) end.x/1195, (double)end.y/920);
+
+        StdDraw.setPenRadius(0.005);
+        StdDraw.setPenColor(StdDraw.RED);
+
+        for (int i = 0; i < pathPoints.size() - 1; i++) {
+            Point P1 = pathPoints.get(i);
+            Point P2 = pathPoints.get(i + 1);
+            StdDraw.line((double) P1.x/1195, (double) P1.y/920, (double) P2.x/1195, (double) P2.y/920);
+
+        }
 
         LineMap mapDilatedLineMap = new LineMap(mapDilatedArray, bounds);
 
