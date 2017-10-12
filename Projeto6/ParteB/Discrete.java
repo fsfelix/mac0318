@@ -54,6 +54,8 @@ public class Discrete {
         }
         populateMap();
         probabilistic();
+        probabilistic();
+        probabilistic();
     }
 
     public double get_w (){
@@ -123,11 +125,19 @@ public class Discrete {
 
     public void probabilistic() {
         ArrayList <coord> neigh = new ArrayList <coord> ();
+        double [][] newMap = new double[this.M][this.N];
         for (int i = 1; i < this.map.length - 1; i++) {
             for (int j = 1; j < this.map[0].length - 1; j++) {
-                this.map[i][j] = 0.4*this.map[i][j] + sumNeighbours(i, j);
+                newMap[i][j] = 0.4*this.map[i][j] + sumNeighbours(i, j);
             }
         }
+
+        for (int i = 0; i < this.M; i++) {
+            for(int j = 0; j < this.N; j++) {
+                this.map[i][j] = newMap[i][j];
+            }
+        }
+
     }
 
     public void thicken() {
@@ -189,7 +199,7 @@ public class Discrete {
                 System.out.println(map[i][j]);
                 System.out.println("COR: " + Math.round(map[i][j]*127.0));
                 // int tom = (int)Math.round((float)(1.0/(float)map[i][j])*127.0);
-                int tom = (255 - map[i][j]*255)
+                int tom = (int) (255 - map[i][j]*255);
                 if (tom > 255)
                     tom = 255;
                 if (tom < 0)
@@ -197,7 +207,8 @@ public class Discrete {
 
                 StdDraw.setPenColor(tom, tom, tom);
 
-                StdDraw.point((double)i/(double)M + RADIUS/2, (double)j/N + RADIUS/2);
+                //StdDraw.point((double)i/(double)M + RADIUS/2, (double)j/N + RADIUS/2);
+                StdDraw.filledSquare((double)i/(double)M + RADIUS/2, (double)j/N + RADIUS/2, RADIUS);
 
             }
         }
