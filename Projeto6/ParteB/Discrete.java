@@ -15,6 +15,7 @@ public class Discrete {
     private int N; // colunas
     public static double [][] map;
     public static double [][] costs;
+    public static double [][] probMap;
 
     Line[] lines = {
 
@@ -50,12 +51,16 @@ public class Discrete {
         this.N = (int) Math.ceil(920.0/w);
         this.map = new double[this.M][this.N];
         this.costs = new double[this.M][this.N];
+        this.probMap = new double[this.M][this.N];
+
         for (int i = 0; i < map.length; i++) {
             for (int j = 0; j < map[i].length; j++) {
-                this.map[i][j] = 0;
-                this.costs[i][j]  = Double.POSITIVE_INFINITY; 
+                this.map[i][j] = Double.POSITIVE_INFINITY;
+                this.probMap[i][j] = 0;
+                this.costs[i][j]  = Double.POSITIVE_INFINITY;
             }
         }
+
         populateMap();
         probabilistic();
         probabilistic();
@@ -91,7 +96,8 @@ public class Discrete {
                 for (int iLine = 0; iLine < 4; iLine++) {
                     for (int iObj = 0; iObj < 14; iObj++) {
                         if (currentLines[iLine].intersectsAt(lines[iObj]) != null) {
-                            this.map[i][j] = 1;
+                            this.map[i][j] = -1;
+                            this.probMap[i][j] = 1;
                             break loop;
                         }
                     }
@@ -108,21 +114,21 @@ public class Discrete {
         float sum = 0;
 
         if (i - 1 >= 0)
-            sum += 0.1*this.map[i - 1][j];
+            sum += 0.1*this.probMap[i - 1][j];
         if (i + 1 < M)
-            sum += 0.1*this.map[i + 1][j];
+            sum += 0.1*this.probMap[i + 1][j];
         if (j - 1 >= 0)
-            sum += 0.1*this.map[i][j - 1];
+            sum += 0.1*this.probMap[i][j - 1];
         if (j + 1 < N)
-            sum += 0.1*this.map[i][j + 1];
+            sum += 0.1*this.probMap[i][j + 1];
         if (i - 1 >= 0 && j - 1 >= 0)
-            sum += 0.05*this.map[i - 1][j - 1];
+            sum += 0.05*this.probMap[i - 1][j - 1];
         if (i - 1 >= 0 && j + 1 < N)
-            sum += 0.05*this.map[i - 1][j + 1];
+            sum += 0.05*this.probMap[i - 1][j + 1];
         if (i + 1 < M && j - 1 >= 0)
-            sum += 0.05*this.map[i + 1][j - 1];
+            sum += 0.05*this.probMap[i + 1][j - 1];
         if (i + 1 < M && j + 1 < N)
-            sum += 0.05*this.map[i + 1][j + 1];
+            sum += 0.05*this.probMap[i + 1][j + 1];
 
         return sum;
     }
@@ -132,13 +138,13 @@ public class Discrete {
         double [][] newMap = new double[this.M][this.N];
         for (int i = 1; i < this.map.length - 1; i++) {
             for (int j = 1; j < this.map[0].length - 1; j++) {
-                newMap[i][j] = 0.4*this.map[i][j] + sumNeighbours(i, j);
+                newMap[i][j] = 0.4*this.probMap[i][j] + sumNeighbours(i, j);
             }
         }
 
         for (int i = 0; i < this.M; i++) {
             for(int j = 0; j < this.N; j++) {
-                this.map[i][j] = newMap[i][j];
+                this.probMap[i][j] = newMap[i][j];
             }
         }
 
@@ -217,12 +223,16 @@ public class Discrete {
     }
 
     public static void updateNeighbour(coord current, coord n) {
-        if (current.x() != n.x() && current.y() != n.y())
-            //map[n.x()][n.y()] += map[current.x()][current.y()] + Math.sqrt(2);
+        if (current.x() != n.x() && current.y() != n.y()) {
+            map[n.x()][n.y()] = map[current.x()][current.y()] + Math.sqrt(2);
             costs[n.x()][n.y()] = costs[current.x()][current.y()] + Math.sqrt(2);
-        else
+        }
+        else {
+            
             //map[n.x()][n.y()] += map[current.x()][current.y()] + 1;
+            map[n.x()][n.y()] = map[current.x()][current.y()] + 1;
             costs[n.x()][n.y()] = costs[current.x()][current.y()] + 1;
+        }
     }
 
     public static double distance(coord c1, coord c2) {
@@ -233,7 +243,7 @@ public class Discrete {
         int M = map.length;
         int N = map[0].length;
         double h = distance(n, goal)/distance(new coord(0,0), new coord(M - 1, N - 1));
-        double p = map[n.x()][n.y()];
+        double p = probMap[n.x()][n.y()];
         double c = costs[n.x()][n.y()]/(M * N);
         System.out.println("h " + h);
         System.out.println("p " + p);
@@ -416,19 +426,25 @@ public class Discrete {
                 }
             };
 
+        coord[][] prev = new coord[M][N];
         PriorityQueue <coord> pq = new PriorityQueue <coord> (M*N, cmp);
         PriorityQueue <coord> explored = new PriorityQueue <coord> (M*N, cmp_e);
         boolean found = false;
         pq.add(init);
+
         costs[init.x()][init.y()] = 0;
+        map[init.x()][init.y()] = 0;
         while (!found) {
             coord cur = pq.poll();
             explored.add(cur);
             System.out.println("ué");
             for (coord n : getNeighbours(cur)) {
                 if (!explored.contains(n)) {
-                    updateNeighbour(cur, n);
-                    pq.add(n);
+                    if (map[n.x()][n.y()] != -1 && map[n.x()][n.y()] > map[cur.x()][cur.y()] + 1) {
+                        updateNeighbour(cur, n);
+                        pq.add(n);
+                        prev[n.x()][n.y()] = cur;
+                    }
                     if (n.equals(goal)) {
                         found = true;
                         explored.add(goal);
@@ -439,7 +455,15 @@ public class Discrete {
             }
         }
 
-        ArrayList <coord> path = getPath(explored, init, goal);
+        ArrayList <coord> path = new ArrayList <coord> ();
+        coord tmp = goal;
+        path.add(goal);
+        while (tmp.x() != init.x() || tmp.y() != init.y()) {
+            tmp = prev[tmp.x()][tmp.y()];
+            path.add(0, tmp);
+        }
+
+        // ArrayList <coord> path = getPath(explored, init, goal);
         for (coord c : path)
             System.out.println(c.x() + " " + c.y());
         drawPath(path);
@@ -472,7 +496,7 @@ public class Discrete {
                 // System.out.println(map[i][j]);
                 // System.out.println("COR: " + Math.round(map[i][j]*127.0));
                 // int tom = (int)Math.round((float)(1.0/(float)map[i][j])*127.0);
-                int tom = (int) (255 - map[i][j]*255);
+                int tom = (int) (255 - probMap[i][j]*255);
                 if (tom > 255)
                     tom = 255;
                 if (tom < 0)
@@ -546,9 +570,13 @@ public class Discrete {
 
     public static void main(String[] args) {
         Discrete dsc = new Discrete (40, 40);
+        System.out.println(map.length);
+        System.out.println(map[0].length);
+
         drawMatrix();
         coord init = new coord(0, 0);
-        coord goal = new coord(10, 20);
+        //coord goal = new coord(3, 20);
+        coord goal = new coord(20, 3);
         drawPoint(init);
         drawPoint(goal);
         aStar(init, goal);
