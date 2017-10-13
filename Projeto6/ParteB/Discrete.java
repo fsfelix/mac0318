@@ -1,3 +1,4 @@
+import java.util.*;
 import java.util.ArrayList;
 import lejos.pc.comm.*;
 import lejos.geom.*;
@@ -5,6 +6,7 @@ import lejos.robotics.mapping.LineMap;
 import java.util.Scanner;
 import java.io.*;
 import lejos.util.Delay;
+import java.util.PriorityQueue;
 
 public class Discrete {
     private double width;
@@ -12,6 +14,7 @@ public class Discrete {
     private int M; // linhas
     private int N; // colunas
     public static double [][] map;
+    public static double [][] costs;
 
     Line[] lines = {
 
@@ -46,10 +49,11 @@ public class Discrete {
         this.M = (int) Math.ceil(1195.0/h);
         this.N = (int) Math.ceil(920.0/w);
         this.map = new double[this.M][this.N];
-
+        this.costs = new double[this.M][this.N];
         for (int i = 0; i < map.length; i++) {
             for (int j = 0; j < map[i].length; j++) {
                 this.map[i][j] = 0;
+                this.costs[i][j]  = Double.POSITIVE_INFINITY; 
             }
         }
         populateMap();
@@ -186,6 +190,275 @@ public class Discrete {
         this.map = newMap;
     }
 
+    public static ArrayList <coord> getNeighbours (coord cur) {
+        ArrayList <coord> neigh = new ArrayList <coord> ();
+        int i = cur.x();
+        int j = cur.y();
+        int M = map.length;
+        int N = map[0].length;
+
+        if (i - 1 >= 0)
+            neigh.add(new coord(i - 1, j));
+        if (i + 1 < M)
+            neigh.add(new coord(i + 1, j));
+        if (j - 1 >= 0)
+            neigh.add(new coord(i, j - 1));
+        if (j + 1 < N)
+            neigh.add(new coord(i, j + 1));
+        if (i - 1 >= 0 && j - 1 >= 0)
+            neigh.add(new coord(i - 1, j - 1));
+        if (i - 1 >= 0 && j + 1 < N)
+            neigh.add(new coord(i - 1, j + 1));
+        if (i + 1 < M && j - 1 >= 0)
+            neigh.add(new coord(i + 1, j - 1));
+        if (i + 1 < M && j + 1 < N)
+            neigh.add(new coord(i + 1, j + 1));
+        return neigh;
+    }
+
+    public static void updateNeighbour(coord current, coord n) {
+        if (current.x() != n.x() && current.y() != n.y())
+            //map[n.x()][n.y()] += map[current.x()][current.y()] + Math.sqrt(2);
+            costs[n.x()][n.y()] = costs[current.x()][current.y()] + Math.sqrt(2);
+        else
+            //map[n.x()][n.y()] += map[current.x()][current.y()] + 1;
+            costs[n.x()][n.y()] = costs[current.x()][current.y()] + 1;
+    }
+
+    public static double distance(coord c1, coord c2) {
+        return Math.sqrt(Math.pow(c1.x() - c2.x(), 2) + Math.pow(c1.y() - c2.y(), 2));
+    }
+
+    public static double evaluateFunction(coord n, coord goal) {
+        int M = map.length;
+        int N = map[0].length;
+        double h = distance(n, goal)/distance(new coord(0,0), new coord(M - 1, N - 1));
+        double p = map[n.x()][n.y()];
+        double c = costs[n.x()][n.y()]/(M * N);
+        System.out.println("h " + h);
+        System.out.println("p " + p);
+        System.out.println("c " + c);
+        System.out.println("aqui dentro dando infinito? " + (c*p+h));
+        return c*p + h;
+    }
+
+
+    public static int argmin(double [] array) {
+        double min = Double.POSITIVE_INFINITY;
+        int argmin = -1;
+        for (int ii = 0; ii < array.length; ii++) {
+            if (array[ii] < min) {
+                min = array[ii];
+                argmin = ii;
+            }
+        }
+        return argmin;
+    }
+
+    public static coord updatePosWithMinValue(PriorityQueue <coord> explored, coord tmp, coord goal) {
+        int M = map.length;
+        int N = map[0].length;
+        int i = tmp.x();
+        int j = tmp.y();
+        int argmin = -1;
+        int connectivity = 8;
+        double [] costs_tmp = new double[connectivity];
+        coord updated = new coord(-1, -1);
+
+        for (int ii = 0; ii < connectivity; ii++)
+            costs_tmp[ii] = Double.POSITIVE_INFINITY;
+
+        if (i - 1 >= 0 && explored.contains(new coord(i - 1, j))) {
+            // costs_tmp[0] = map[i - 1][j];
+            System.out.println( (i-1) + " " + j);
+            explored.remove(new coord(i - 1, j));
+            costs_tmp[0] = evaluateFunction(new coord(i - 1, j), goal); }
+
+        if (i + 1 < M && explored.contains(new coord(i + 1, j))) {
+            // costs_tmp[1] = map[i + 1][j];
+            System.out.println( (i+1) + " " + j);
+            explored.remove(new coord(i + 1, j));
+            costs_tmp[1] = evaluateFunction(new coord(i + 1, j), goal); }
+
+        if (j - 1 >= 0 && explored.contains(new coord(i, j - 1))) {
+            // costs_tmp[2] = map[i][j - 1];
+            System.out.println(i + " " + (j-1));
+            explored.remove(new coord(i, j - 1));
+            costs_tmp[2] = evaluateFunction(new coord(i, j - 1), goal); }
+
+        if (j + 1 < N && explored.contains(new coord(i, j + 1))) {
+            // costs_tmp[3] = map[i][j + 1];
+            System.out.println(i + " " + (j+1));
+            explored.remove(new coord(i, j + 1));
+            costs_tmp[3] = evaluateFunction(new coord(i, j + 1), goal); }
+
+        if (i - 1 >= 0 && explored.contains(new coord(i - 1, j - 1))) {
+            // costs_tmp[4] = map[i - 1][j - 1];
+            System.out.println((i-1) + " " + (j-1));
+            explored.remove(new coord(i - 1, j - 1));
+            costs_tmp[4] = evaluateFunction(new coord(i - 1, j - 1), goal);}
+
+        if (i - 1 >= 0 && explored.contains(new coord(i - 1, j + 1))) {
+            // costs_tmp[5] = map[i - 1][j + 1];
+            System.out.println((i - 1) + " " + (j + 1));
+            explored.remove(new coord(i - 1, j + 1));
+            costs_tmp[5] = evaluateFunction(new coord(i - 1, j + 1), goal); }
+
+        if (i + 1 < M && explored.contains(new coord(i + 1, j - 1))) {
+            // costs_tmp[6] = map[i + 1][j - 1];
+            System.out.println((i+1) + " " + (j-1) );
+            explored.remove(new coord(i + 1, j - 1));
+            costs_tmp[6] = evaluateFunction(new coord(i + 1, j - 1), goal); }
+
+        if (i + 1 < M && explored.contains(new coord(i + 1, j + 1))) {
+            // costs_tmp[7] = map[i + 1][j + 1];
+            System.out.println((i + 1) + " " + (j + 1));
+            explored.remove(new coord(i + 1, j + 1));
+            costs_tmp[7] = evaluateFunction(new coord(i + 1, j + 1), goal);}
+
+        argmin = argmin(costs_tmp);
+        System.out.println("argmin");
+        // for (int ii = 0; ii < costs_tmp.length; i++)
+        //     System.out.println(costs_tmp[ii]);
+
+        if (argmin == -1) {
+            System.out.println("ih rapaz");
+            // for (int ii = 0; ii < costs.length; i++)
+            //     System.out.println(costs[ii]);
+            // System.out.println(map[i - 1][j]);
+            // System.out.println(map[i + 1][j]);
+            // System.out.println(map[i][j - 1]);
+            // System.out.println(map[i][j + 1]);
+        }
+
+        if (argmin == 0) {
+            // map[i - 1][j] = -1;
+            updated = new coord(i - 1, j);
+        }
+
+        if (argmin == 1) {
+            // map[i + 1][j] = -1;
+            updated = new coord(i + 1, j);
+        }
+
+        if (argmin == 2) {
+            // map[i][j - 1] = -1;
+            updated = new coord(i, j - 1);
+        }
+
+        if (argmin == 3) {
+            // map[i][j + 1] = -1;
+            updated = new coord(i, j + 1);
+        }
+
+        if (argmin == 4) {
+            // map[i][j + 1] = -1;
+            updated = new coord(i - 1, j - 1);
+        }
+
+        if (argmin == 5) {
+            // map[i][j + 1] = -1;
+            updated = new coord(i - 1, j + 1);
+        }
+
+        if (argmin == 6) {
+            // map[i][j + 1] = -1;
+            updated = new coord(i + 1, j - 1);
+        }
+
+        if (argmin == 7) {
+            // map[i][j + 1] = -1;
+            updated = new coord(i + 1, j + 1);
+        }
+
+        return updated;
+    }
+
+    public static ArrayList <coord> getPath(PriorityQueue <coord> explored, coord init, coord goal) {
+        int i = goal.x();
+        int j = goal.y();
+        int i_init = init.x();
+        int j_init = init.y();
+        coord tmp = new coord(goal.x(), goal.y());
+        ArrayList <coord> path = new ArrayList <coord> ();
+
+        path.add(goal);
+        while (tmp.x() != i_init || tmp.y() != j_init) {
+            tmp = updatePosWithMinValue(explored, tmp, goal);
+            // System.out.println("a treta está aqui");
+            path.add(0, tmp);
+        }
+        return path;
+    }
+
+
+    public static void aStar(coord init, coord goal) {
+        int M = map.length;
+        int N = map[0].length;
+
+        Comparator cmp = new Comparator <coord> () {
+                public int compare(coord a, coord b) {
+                    if (evaluateFunction(a, goal) > evaluateFunction(b, goal))
+                        return 1;
+                    if (evaluateFunction(a, goal) < evaluateFunction(b, goal))
+                        return -1;
+                    return 0;
+                }
+            };
+
+        Comparator cmp_e = new Comparator <coord> () {
+                public int compare(coord a, coord b) {
+                    if (a.x() > b.x() && a.y() > b.y())
+                        return 1;
+                    if (a.x() < b.x() && a.y() < b.y())
+                        return -1;
+                    return 0;
+                }
+            };
+
+        PriorityQueue <coord> pq = new PriorityQueue <coord> (M*N, cmp);
+        PriorityQueue <coord> explored = new PriorityQueue <coord> (M*N, cmp_e);
+        boolean found = false;
+        pq.add(init);
+        costs[init.x()][init.y()] = 0;
+        while (!found) {
+            coord cur = pq.poll();
+            explored.add(cur);
+            System.out.println("ué");
+            for (coord n : getNeighbours(cur)) {
+                if (!explored.contains(n)) {
+                    updateNeighbour(cur, n);
+                    pq.add(n);
+                    if (n.equals(goal)) {
+                        found = true;
+                        explored.add(goal);
+                        System.out.println("encontrei");
+                        break;
+                    }
+                }
+            }
+        }
+
+        ArrayList <coord> path = getPath(explored, init, goal);
+        for (coord c : path)
+            System.out.println(c.x() + " " + c.y());
+        drawPath(path);
+    }
+
+    public static void drawPath(ArrayList <coord> path) {
+        int M = map.length;
+        int N = map[0].length;
+        double RADIUS = (double) (M*N)/25000;
+
+        for (coord c : path) {
+            StdDraw.setPenColor(StdDraw.RED);
+            int i = c.x();
+            int j = c.y();
+            StdDraw.point((double)i/(double)M + RADIUS/2, (double)j/N + RADIUS/2);
+            //StdDraw.filledSquare((double)i/(double)M + RADIUS/2, (double)j/N + RADIUS/2, RADIUS);
+
+        }
+    }
     public static void drawMatrix() {
         int M = map.length;
         int N = map[0].length;
@@ -196,8 +469,8 @@ public class Discrete {
 
         for (int i = 0; i < M; i++) {
             for (int j = 0; j < N; j++) {
-                System.out.println(map[i][j]);
-                System.out.println("COR: " + Math.round(map[i][j]*127.0));
+                // System.out.println(map[i][j]);
+                // System.out.println("COR: " + Math.round(map[i][j]*127.0));
                 // int tom = (int)Math.round((float)(1.0/(float)map[i][j])*127.0);
                 int tom = (int) (255 - map[i][j]*255);
                 if (tom > 255)
@@ -207,13 +480,22 @@ public class Discrete {
 
                 StdDraw.setPenColor(tom, tom, tom);
 
-                //StdDraw.point((double)i/(double)M + RADIUS/2, (double)j/N + RADIUS/2);
-                StdDraw.filledSquare((double)i/(double)M + RADIUS/2, (double)j/N + RADIUS/2, RADIUS);
+                StdDraw.point((double)i/(double)M + RADIUS/2, (double)j/N + RADIUS/2);
+                //StdDraw.filledSquare((double)i/(double)M + RADIUS/2, (double)j/N + RADIUS/2, RADIUS);
 
             }
         }
     }
 
+    public static void drawPoint(coord c) {
+        int M = map.length;
+        int N = map[0].length;
+        int i = c.x();
+        int j = c.y();
+        double RADIUS = (double) (M*N)/25000;
+        StdDraw.setPenColor(StdDraw.GREEN);
+        StdDraw.point((double)i/(double)M + RADIUS/2, (double)j/N + RADIUS/2);
+    }
     public static ArrayList <Point> xyToMap(ArrayList <coord> path, int w, int h) {
         ArrayList <Point> points = new ArrayList <Point> ();
         for (coord p : path) {
@@ -265,5 +547,10 @@ public class Discrete {
     public static void main(String[] args) {
         Discrete dsc = new Discrete (40, 40);
         drawMatrix();
+        coord init = new coord(0, 0);
+        coord goal = new coord(10, 20);
+        drawPoint(init);
+        drawPoint(goal);
+        aStar(init, goal);
     }
 }

@@ -16,4 +16,14 @@ public class coord {
         return y;
     }
 
+    @Override
+    public boolean equals(Object that) {
+        if (this == that) return true;
+
+        if (! (that instanceof coord)) return false;
+
+        coord thatCoord = (coord) that;
+
+        return this.x() == thatCoord.x() && this.y() == thatCoord.y();
+    }
 }
