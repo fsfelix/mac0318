@@ -139,7 +139,7 @@ public class Graph {
     }
 
     // s: source vertex
-    public ArrayList<Integer> Dijkstra(int s, int target) {
+    public ArrayList<Integer> BestChoice(int s, int target) {
         double [] distTo = new double[this.V];
         int [] prev = new int[this.V];
         PriorityQueue <Integer> pq = new PriorityQueue <Integer> (this.V,

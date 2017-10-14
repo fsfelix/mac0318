@@ -126,7 +126,7 @@ public class MasterNav {
         // Lembre-se que para o P1 no mapa, passe o indice 0,
         // e assim por diante.
 
-        path = graph.Dijkstra(10, 0);
+        path = graph.BestChoice(10, 0);
 
         int[] trajetoria = new int[path.size()];
     
