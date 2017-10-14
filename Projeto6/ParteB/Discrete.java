@@ -11,11 +11,25 @@ import java.util.PriorityQueue;
 public class Discrete {
     private double width;
     private double height;
-    private int M; // linhas
-    private int N; // colunas
+    private int M;                                          // linhas
+    private int N;                                          // colunas
     public static double [][] map;
     public static double [][] costs;
     public static double [][] probMap;
+
+    public static Point[] points = {
+        new Point(100,813),    /* P1 */
+        new Point(428,873),   /* P2 */
+        new Point(1140,885),  /* P3 */
+        new Point(1117,432),  /* P4 */
+        new Point(830,507),   /* P5 */
+        new Point(690,571),   /* P6 */
+        new Point(450,593),   /* P7 */
+        new Point(263,350),   /* P8 */
+        new Point(531,382),   /* P9 */
+        new Point(986,166),    /* P10 */
+        new Point(490,100)     /* P11 */
+    };
 
     Line[] lines = {
 
@@ -34,11 +48,10 @@ public class Discrete {
 
         /* Pentagon */
         new Line(335,345,502,155),
-        new Line(502,155,700,225),
+        // new Line(502,155,700,225),   // base do pentágono!
         new Line(700,225, 725,490),
         new Line(725,490,480,525),
         new Line(480,525,335,345),
-
     };
 
     Rectangle bounds = new Rectangle(0, 0, 1195, 920);
@@ -62,6 +75,8 @@ public class Discrete {
         }
 
         populateMap();
+
+        // Três convoluções
         probabilistic();
         probabilistic();
         probabilistic();
@@ -94,14 +109,13 @@ public class Discrete {
                 currentLines[3] = new Line((int) Math.ceil((i + 1) * this.height), (int) Math.ceil(j * this.width), (int) Math.ceil(i * this.height), (int) Math.ceil(j * this.width));
                 loop:
                 for (int iLine = 0; iLine < 4; iLine++) {
-                    for (int iObj = 0; iObj < 14; iObj++) {
+                    for (int iObj = 0; iObj < lines.length; iObj++) {                                                     
                         if (currentLines[iLine].intersectsAt(lines[iObj]) != null) {
                             this.map[i][j] = -1;
                             this.probMap[i][j] = 1;
                             break loop;
                         }
                     }
-
                 }
             }
         }
@@ -147,7 +161,6 @@ public class Discrete {
                 this.probMap[i][j] = newMap[i][j];
             }
         }
-
     }
 
     public void thicken() {
@@ -253,7 +266,6 @@ public class Discrete {
         //return c*p + h;
         return alpha*c + (1-alpha)*p + h;
     }
-
 
     public static int argmin(double [] array) {
         double min = Double.POSITIVE_INFINITY;
@@ -403,7 +415,6 @@ public class Discrete {
         return path;
     }
 
-
     public static void aStar(coord init, coord goal) {
         int M = map.length;
         int N = map[0].length;
@@ -485,6 +496,7 @@ public class Discrete {
 
         }
     }
+
     public static void drawMatrix() {
         int M = map.length;
         int N = map[0].length;
@@ -522,6 +534,7 @@ public class Discrete {
         StdDraw.setPenColor(StdDraw.GREEN);
         StdDraw.point((double)i/(double)M + RADIUS/2, (double)j/N + RADIUS/2);
     }
+
     public static ArrayList <Point> xyToMap(ArrayList <coord> path, int w, int h) {
         ArrayList <Point> points = new ArrayList <Point> ();
         for (coord p : path) {
@@ -570,15 +583,23 @@ public class Discrete {
         return newPath;
     }
 
+    public static coord pointAsCoord(int i, int size) {
+        coord c = new coord((int) points[i-1].x / size, (int) points[i-1].y / size);
+        return c;
+    }
+
     public static void main(String[] args) {
-        Discrete dsc = new Discrete (40, 40);
-        System.out.println(map.length);
-        System.out.println(map[0].length);
+
+        int size = 40;
+
+        Discrete dsc = new Discrete (size, size);
+        // coord init = pointAsCoord(1, size);
+        // coord goal = pointAsCoord(10, size);
+
+        coord init = pointAsCoord(1, size);
+        coord goal = pointAsCoord(9, size);
 
         drawMatrix();
-        coord init = new coord(0, 0);
-        //coord goal = new coord(3, 20);
-        coord goal = new coord(20, 3);
         drawPoint(init);
         drawPoint(goal);
         aStar(init, goal);
