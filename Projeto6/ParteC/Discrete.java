@@ -44,6 +44,8 @@ public class Discrete {
     public static double custo2 = 0.5; // custo de girar 90 graus
     public static double custo3 = 1; // custo de girar 180 graus
 
+    public static double alpha = 0; // alpha da função de avaliação aditiva
+
     public static Point[] points = {
         new Point(100,813),    /* P1 */
         new Point(428,873),   /* P2 */
@@ -400,7 +402,7 @@ public class Discrete {
         double h = distance(n, goal)/distance(new coord(0,0), new coord(M - 1, N - 1));
         double p = probMap[n.x()][n.y()];
         double c = costs[n.x()][n.y()]/(M * N);
-        double alpha = 1;
+        //double alpha = 1;
         // System.out.println("h " + h);
         // System.out.println("p " + p);
         // System.out.println("c " + c);
