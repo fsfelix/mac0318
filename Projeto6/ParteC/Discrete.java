@@ -8,6 +8,28 @@ import java.io.*;
 import lejos.util.Delay;
 import java.util.PriorityQueue;
 
+
+
+/*
+                       1
+                       ^
+                       |
+                       |
+                       |
+             8 <----- ROBO ----> 3
+                       |
+                       |
+                       |
+                       v
+                       5
+
+
+                      As diagonais são 2, 4, 6, 7.
+                      Por definição, o robo inicia com
+                      pose 3, como se ele estivesse apontando
+                      para a direita.
+ */
+
 public class Discrete {
     private double width;
     private double height;
@@ -16,6 +38,11 @@ public class Discrete {
     public static double [][] map;
     public static double [][] costs;
     public static double [][] probMap;
+
+    public static double custo0 = 0; // custo de manter-se na mesma direção
+    public static double custo1 = 0.25; // custo de girar 45 graus
+    public static double custo2 = 0.5; // custo de girar 90 graus
+    public static double custo3 = 1; // custo de girar 180 graus
 
     public static Point[] points = {
         new Point(100,813),    /* P1 */
@@ -235,37 +262,131 @@ public class Discrete {
         return neigh;
     }
 
-    public static void updateNeighbour(coord current, coord n) {
-        if (current.x() != n.x() && current.y() != n.y()) {
-            map[n.x()][n.y()] = map[current.x()][current.y()] + Math.sqrt(2);
-            costs[n.x()][n.y()] = costs[current.x()][current.y()] + Math.sqrt(2);
-        }
-        else {
-            //map[n.x()][n.y()] += map[current.x()][current.y()] + 1;
-            map[n.x()][n.y()] = map[current.x()][current.y()] + 1;
-            costs[n.x()][n.y()] = costs[current.x()][current.y()] + 1;
-        }
-    }
 
-    public static boolean checkIfCostDecreases(coord current, coord n) {
+    public static int relativePose(coord current, coord n) {
         int c_i = current.x();
         int c_j = current.y();
         int n_i = n.x();
         int n_j = n.y();
 
-        if (c_i != n_i && c_j != n_j) {
-            if (map[n_i][n_j] > map[c_i][c_j] + Math.sqrt(2))
+        if (c_i - n_i == 1 && c_j - n_j == 1) {
+            return 8;
+        }
+        if (c_i - n_i == 1 && c_j - n_j == 0) {
+            return 1;
+        }
+        if (c_i - n_i == 1 && c_j - n_j == -1) {
+            return 2;
+        }
+        if (c_i - n_i == 0 && c_j - n_j == -1) {
+            return 3;
+        }
+        if (c_i - n_i == -1 && c_j - n_j == -1) {
+            return 4;
+        }
+        if (c_i - n_i == -1 && c_j - n_j == 0) {
+            return 5;
+        }
+        if (c_i - n_i == -1 && c_j - n_j == 1) {
+            return 6;
+        }
+        if (c_i - n_i == 0 && c_j - n_j == 1) {
+            return 7;
+        }
+        return -1;
+    }
+
+    public static void updateNeighbour(coord current, coord n, int poseAtual) {
+        int c_i = current.x();
+        int c_j = current.y();
+        int n_i = n.x();
+        int n_j = n.y();
+
+        int relativePose = relativePose(current, n);
+        int k = Math.abs(poseAtual - relativePose)%4;
+        System.out.println(k);
+        if (k == 0) {
+            map[n_i][n_j] = map[c_i][c_j] + custo0;
+            costs[n_i][n_j] = costs[c_i][c_j] + custo0;
+        }
+
+        if (k == 1) {
+            map[n_i][n_j] = map[c_i][c_j] + custo1;
+            costs[n_i][n_j] = costs[c_i][c_j] + custo1;
+        }
+
+        if (k == 2) {
+            map[n_i][n_j] = map[c_i][c_j] + custo2;
+            costs[n_i][n_j] = costs[c_i][c_j] + custo2;
+        }
+
+        if (k == 3) {
+            map[n_i][n_j] = map[c_i][c_j] + custo3;
+            costs[n_i][n_j] = costs[c_i][c_j] + custo3;
+        }
+
+        // if (current.x() != n.x() && current.y() != n.y()) {
+        //     map[n.x()][n.y()] = map[current.x()][current.y()] + Math.sqrt(2);
+        //     costs[n.x()][n.y()] = costs[current.x()][current.y()] + Math.sqrt(2);
+        // }
+        // else {
+        //     //map[n.x()][n.y()] += map[current.x()][current.y()] + 1;
+        //     map[n.x()][n.y()] = map[current.x()][current.y()] + 1;
+        //     costs[n.x()][n.y()] = costs[current.x()][current.y()] + 1;
+        // }
+
+    }
+
+    public static boolean checkIfCostDecreases(coord current, coord n, int poseAtual) {
+        int c_i = current.x();
+        int c_j = current.y();
+        int n_i = n.x();
+        int n_j = n.y();
+
+        int relativePose = relativePose(current, n);
+        int k = Math.abs(poseAtual - relativePose)%4;
+
+        if (k == 0) {
+            if (map[n_i][n_j] > map[c_i][c_j] + custo0)
                 return true;
             else
                 return false;
         }
 
-        else {
-            if (map[n_i][n_j] > map[c_i][c_j] + 1)
+        if (k == 1) {
+            if (map[n_i][n_j] > map[c_i][c_j] + custo1)
                 return true;
             else
                 return false;
         }
+
+        if (k == 2) {
+            if (map[n_i][n_j] > map[c_i][c_j] + custo2)
+                return true;
+            else
+                return false;
+        }
+
+        if (k == 3) {
+            if (map[n_i][n_j] > map[c_i][c_j] + custo3)
+                return true;
+            else
+                return false;
+        }
+        return false;
+        // if (c_i != n_i && c_j != n_j) {
+        //     if (map[n_i][n_j] > map[c_i][c_j] + Math.sqrt(2))
+        //         return true;
+        //     else
+        //         return false;
+        // }
+
+        // else {
+        //     if (map[n_i][n_j] > map[c_i][c_j] + 1)
+        //         return true;
+        //     else
+        //         return false;
+        // }
 
     }
 
@@ -280,10 +401,10 @@ public class Discrete {
         double p = probMap[n.x()][n.y()];
         double c = costs[n.x()][n.y()]/(M * N);
         double alpha = 1;
-        System.out.println("h " + h);
-        System.out.println("p " + p);
-        System.out.println("c " + c);
-        System.out.println("aqui dentro dando infinito? " + (c*p+h));
+        // System.out.println("h " + h);
+        // System.out.println("p " + p);
+        // System.out.println("c " + c);
+        // System.out.println("aqui dentro dando infinito? " + (c*p+h));
         //return c*p + h;
         return alpha*c + (1-alpha)*p + h;
     }
@@ -298,142 +419,6 @@ public class Discrete {
             }
         }
         return argmin;
-    }
-
-    public static coord updatePosWithMinValue(PriorityQueue <coord> explored, coord tmp, coord goal) {
-        int M = map.length;
-        int N = map[0].length;
-        int i = tmp.x();
-        int j = tmp.y();
-        int argmin = -1;
-        int connectivity = 8;
-        double [] costs_tmp = new double[connectivity];
-        coord updated = new coord(-1, -1);
-
-        for (int ii = 0; ii < connectivity; ii++)
-            costs_tmp[ii] = Double.POSITIVE_INFINITY;
-
-        if (i - 1 >= 0 && explored.contains(new coord(i - 1, j))) {
-            // costs_tmp[0] = map[i - 1][j];
-            System.out.println( (i-1) + " " + j);
-            explored.remove(new coord(i - 1, j));
-            costs_tmp[0] = evaluateFunction(new coord(i - 1, j), goal); }
-
-        if (i + 1 < M && explored.contains(new coord(i + 1, j))) {
-            // costs_tmp[1] = map[i + 1][j];
-            System.out.println( (i+1) + " " + j);
-            explored.remove(new coord(i + 1, j));
-            costs_tmp[1] = evaluateFunction(new coord(i + 1, j), goal); }
-
-        if (j - 1 >= 0 && explored.contains(new coord(i, j - 1))) {
-            // costs_tmp[2] = map[i][j - 1];
-            System.out.println(i + " " + (j-1));
-            explored.remove(new coord(i, j - 1));
-            costs_tmp[2] = evaluateFunction(new coord(i, j - 1), goal); }
-
-        if (j + 1 < N && explored.contains(new coord(i, j + 1))) {
-            // costs_tmp[3] = map[i][j + 1];
-            System.out.println(i + " " + (j+1));
-            explored.remove(new coord(i, j + 1));
-            costs_tmp[3] = evaluateFunction(new coord(i, j + 1), goal); }
-
-        if (i - 1 >= 0 && explored.contains(new coord(i - 1, j - 1))) {
-            // costs_tmp[4] = map[i - 1][j - 1];
-            System.out.println((i-1) + " " + (j-1));
-            explored.remove(new coord(i - 1, j - 1));
-            costs_tmp[4] = evaluateFunction(new coord(i - 1, j - 1), goal);}
-
-        if (i - 1 >= 0 && explored.contains(new coord(i - 1, j + 1))) {
-            // costs_tmp[5] = map[i - 1][j + 1];
-            System.out.println((i - 1) + " " + (j + 1));
-            explored.remove(new coord(i - 1, j + 1));
-            costs_tmp[5] = evaluateFunction(new coord(i - 1, j + 1), goal); }
-
-        if (i + 1 < M && explored.contains(new coord(i + 1, j - 1))) {
-            // costs_tmp[6] = map[i + 1][j - 1];
-            System.out.println((i+1) + " " + (j-1) );
-            explored.remove(new coord(i + 1, j - 1));
-            costs_tmp[6] = evaluateFunction(new coord(i + 1, j - 1), goal); }
-
-        if (i + 1 < M && explored.contains(new coord(i + 1, j + 1))) {
-            // costs_tmp[7] = map[i + 1][j + 1];
-            System.out.println((i + 1) + " " + (j + 1));
-            explored.remove(new coord(i + 1, j + 1));
-            costs_tmp[7] = evaluateFunction(new coord(i + 1, j + 1), goal);}
-
-        argmin = argmin(costs_tmp);
-        System.out.println("argmin");
-        // for (int ii = 0; ii < costs_tmp.length; i++)
-        //     System.out.println(costs_tmp[ii]);
-
-        if (argmin == -1) {
-            System.out.println("ih rapaz");
-            // for (int ii = 0; ii < costs.length; i++)
-            //     System.out.println(costs[ii]);
-            // System.out.println(map[i - 1][j]);
-            // System.out.println(map[i + 1][j]);
-            // System.out.println(map[i][j - 1]);
-            // System.out.println(map[i][j + 1]);
-        }
-
-        if (argmin == 0) {
-            // map[i - 1][j] = -1;
-            updated = new coord(i - 1, j);
-        }
-
-        if (argmin == 1) {
-            // map[i + 1][j] = -1;
-            updated = new coord(i + 1, j);
-        }
-
-        if (argmin == 2) {
-            // map[i][j - 1] = -1;
-            updated = new coord(i, j - 1);
-        }
-
-        if (argmin == 3) {
-            // map[i][j + 1] = -1;
-            updated = new coord(i, j + 1);
-        }
-
-        if (argmin == 4) {
-            // map[i][j + 1] = -1;
-            updated = new coord(i - 1, j - 1);
-        }
-
-        if (argmin == 5) {
-            // map[i][j + 1] = -1;
-            updated = new coord(i - 1, j + 1);
-        }
-
-        if (argmin == 6) {
-            // map[i][j + 1] = -1;
-            updated = new coord(i + 1, j - 1);
-        }
-
-        if (argmin == 7) {
-            // map[i][j + 1] = -1;
-            updated = new coord(i + 1, j + 1);
-        }
-
-        return updated;
-    }
-
-    public static ArrayList <coord> getPath(PriorityQueue <coord> explored, coord init, coord goal) {
-        int i = goal.x();
-        int j = goal.y();
-        int i_init = init.x();
-        int j_init = init.y();
-        coord tmp = new coord(goal.x(), goal.y());
-        ArrayList <coord> path = new ArrayList <coord> ();
-
-        path.add(goal);
-        while (tmp.x() != i_init || tmp.y() != j_init) {
-            tmp = updatePosWithMinValue(explored, tmp, goal);
-            // System.out.println("a treta está aqui");
-            path.add(0, tmp);
-        }
-        return path;
     }
 
     public static void aStar(coord init, coord goal) {
@@ -468,33 +453,46 @@ public class Discrete {
 
         costs[init.x()][init.y()] = 0;
         map[init.x()][init.y()] = 0;
+        int pose = 3;
+        coord cur = pq.poll();
         while (!found) {
-            coord cur = pq.poll();
             explored.add(cur);
-            System.out.println("ué");
             for (coord n : getNeighbours(cur)) {
                 if (!explored.contains(n)) {
                     //if (map[n.x()][n.y()] != -1 && map[n.x()][n.y()] > map[cur.x()][cur.y()] + 1) {
-                    if (map[n.x()][n.y()] != -1 && checkIfCostDecreases(cur, n)) {
-                        updateNeighbour(cur, n);
+                    if (map[n.x()][n.y()] != -1 && checkIfCostDecreases(cur, n, pose)) {
+                        updateNeighbour(cur, n, pose);
+
+                        //System.out.println("pose antiga: " + pose + " pose nova " + nextPose(cur, n));
+                        // pose = nextPose(cur, n);
                         pq.add(n);
+                        // System.out.println(n.x() + " neigh " +n.y());
+                        // System.out.println(cur.x() + " current " +cur.y());
                         prev[n.x()][n.y()] = cur;
-                    }
-                    if (n.equals(goal)) {
-                        found = true;
-                        explored.add(goal);
-                        System.out.println("encontrei");
-                        break;
+                        //   }
+                        if (n.equals(goal)) {
+                            found = true;
+                            explored.add(goal);
+                            System.out.println("encontrei");
+                            System.out.println("Goal: " + goal.x() + " " + goal.y());
+                            System.out.println("Goal encontrado: " + n.x() + " " + n.y());
+                            break;
+                        }
                     }
                 }
             }
+            coord ant = new coord(cur.x(), cur.y());
+            cur = pq.poll();
+            pose = relativePose(ant, cur);
         }
 
         ArrayList <coord> path = new ArrayList <coord> ();
         coord tmp = goal;
         path.add(goal);
         while (tmp.x() != init.x() || tmp.y() != init.y()) {
+            //System.out.println(tmp.x() + " " + tmp.y());
             tmp = prev[tmp.x()][tmp.y()];
+            //System.out.println(tmp.x() + " " + tmp.y());
             path.add(0, tmp);
         }
 
@@ -612,7 +610,7 @@ public class Discrete {
 
     public static void main(String[] args) {
 
-        int size = 30;
+        int size = 50;
 
         Discrete dsc = new Discrete (size, size);
         
@@ -620,7 +618,7 @@ public class Discrete {
         // coord goal = pointAsCoord(10, size);
 
         coord init = pointAsCoord(1, size);
-        coord goal = pointAsCoord(8, size);
+        coord goal = pointAsCoord(10, size);
 
         drawMatrix();
         drawPoint(init);
