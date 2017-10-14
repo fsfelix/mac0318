@@ -501,7 +501,7 @@ public class Discrete {
         int M = map.length;
         int N = map[0].length;
         double RADIUS = (double) (M*N)/25000;
-        StdDraw.setCanvasSize(M * 15, N * 15);
+        StdDraw.setCanvasSize(M * 30, N * 30);
         StdDraw.setPenRadius(RADIUS);
         StdDraw.clear(StdDraw.WHITE);
 
@@ -590,9 +590,10 @@ public class Discrete {
 
     public static void main(String[] args) {
 
-        int size = 40;
+        int size = 30;
 
         Discrete dsc = new Discrete (size, size);
+        
         // coord init = pointAsCoord(1, size);
         // coord goal = pointAsCoord(10, size);
 
