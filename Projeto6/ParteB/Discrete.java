@@ -17,23 +17,23 @@ public class Discrete {
     public static double [][] costs;
     public static double [][] probMap;
 
-    public static double alpha = 0; // alpha da função de avaliação aditiva
+    public static double alpha = 1;                         // alpha da função de avaliação aditiva
 
     public static Point[] points = {
-        new Point(100,813),    /* P1 */
-        new Point(428,873),   /* P2 */
-        new Point(1140,885),  /* P3 */
-        new Point(1117,432),  /* P4 */
-        new Point(830,507),   /* P5 */
-        new Point(690,571),   /* P6 */
-        new Point(450,593),   /* P7 */
-        new Point(263,350),   /* P8 */
-        new Point(531,382),   /* P9 */
-        new Point(986,166),    /* P10 */
-        new Point(490,100)     /* P11 */
+        new Point(100,813),                                 /* P1 */
+        new Point(428,873),                                 /* P2 */
+        new Point(1140,885),                                /* P3 */
+        new Point(1117,432),                                /* P4 */
+        new Point(830,507),                                 /* P5 */
+        new Point(690,571),                                 /* P6 */
+        new Point(450,593),                                 /* P7 */
+        new Point(263,350),                                 /* P8 */
+        new Point(531,382),                                 /* P9 */
+        new Point(986,166),                                 /* P10 */
+        new Point(490,100)                                  /* P11 */
     };
 
-    Line[] lines = {
+    public static Line[] lines = {
 
         /* L-shape polygon */
         new Line(170,437,60,680),
@@ -50,7 +50,7 @@ public class Discrete {
 
         /* Pentagon */
         new Line(335,345,502,155),
-        new Line(502,155,700,225),   // base do pentágono!
+        new Line(502,155,700,225),                           // base do pentágono!
         new Line(700,225, 725,490),
         new Line(725,490,480,525),
         new Line(480,525,335,345),
@@ -499,10 +499,17 @@ public class Discrete {
             path.add(0, tmp);
         }
 
+        /************************************************************/
+
+        path = linearizePath(path, 50, 50);
+        drawLinearizedPath(path);
+
+        /************************************************************/
+
         // ArrayList <coord> path = getPath(explored, init, goal);
         for (coord c : path)
             System.out.println(c.x() + " " + c.y());
-        drawPath(path);
+        // drawPath(path);
     }
 
     public static void drawPath(ArrayList <coord> path) {
@@ -516,8 +523,23 @@ public class Discrete {
             int j = c.y();
             StdDraw.point((double)i/(double)M + RADIUS/2, (double)j/N + RADIUS/2);
             //StdDraw.filledSquare((double)i/(double)M + RADIUS/2, (double)j/N + RADIUS/2, RADIUS);
+        }
+    }
+
+    public static void drawLinearizedPath(ArrayList <coord> path) {
+        int M = map.length;
+        int N = map[0].length;
+
+        for (int i=0; i<path.size(); i+=2){
+
+            coord c1 = path.get(i);
+            coord c2 = path.get(i+1);
+
+            StdDraw.setPenColor(StdDraw.RED);
+            StdDraw.line((double) c1.x() /(double)M, (double) c1.y() / (double)N, (double) c2.x()/(double)M, (double) c2.y()/(double)N);
 
         }
+
     }
 
     public static void drawMatrix() {
@@ -567,7 +589,7 @@ public class Discrete {
         return points;
     }
 
-    public ArrayList <coord> linearizePath(ArrayList <coord> path, int w, int h) {
+    public static ArrayList <coord> linearizePath(ArrayList <coord> path, int w, int h) {
         coord[] pathArray = new coord[path.size()];
         pathArray = path.toArray(pathArray);
 
@@ -578,7 +600,7 @@ public class Discrete {
             boolean found = false;
             for (current = init + 1; current < pathArray.length; current++) {
                 found = false;
-                Line tmp = new Line((int) (pathArray[init].x()*this.width), (int)(pathArray[init].y()*this.height), (int)(pathArray[current].x()*this.width), (int)(pathArray[current].y()*this.height) );
+                Line tmp = new Line((int) (pathArray[init].x()*w), (int)(pathArray[init].y()*h), (int)(pathArray[current].x()*w), (int)(pathArray[current].y()*h) );
 
                 for (int l = 0; l < lines.length && !found; l++) {
                     if (tmp.intersectsAt(lines[l]) != null) {
@@ -613,7 +635,7 @@ public class Discrete {
 
     public static void main(String[] args) {
 
-        int size = 30;
+        int size = 50;
 
         Discrete dsc = new Discrete (size, size);
         
@@ -621,7 +643,7 @@ public class Discrete {
         // coord goal = pointAsCoord(10, size);
 
         coord init = pointAsCoord(1, size);
-        coord goal = pointAsCoord(8, size);
+        coord goal = pointAsCoord(9, size);
 
         drawMatrix();
         drawPoint(init);
