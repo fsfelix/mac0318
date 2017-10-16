@@ -243,7 +243,6 @@ public class Discrete {
             costs[n.x()][n.y()] = costs[current.x()][current.y()] + Math.sqrt(2);
         }
         else {
-            //map[n.x()][n.y()] += map[current.x()][current.y()] + 1;
             map[n.x()][n.y()] = map[current.x()][current.y()] + 1;
             costs[n.x()][n.y()] = costs[current.x()][current.y()] + 1;
         }
@@ -281,11 +280,6 @@ public class Discrete {
         double h = distance(n, goal)/distance(new coord(0,0), new coord(M - 1, N - 1));
         double p = probMap[n.x()][n.y()];
         double c = costs[n.x()][n.y()]/(M * N);
-        // System.out.println("h " + h);
-        // System.out.println("p " + p);
-        // System.out.println("c " + c);
-        // System.out.println("aqui dentro dando infinito? " + (c*p+h));
-        //return c*p + h;
         return alpha*c + (1-alpha)*p + h;
     }
 
@@ -308,112 +302,88 @@ public class Discrete {
         int j = tmp.y();
         int argmin = -1;
         int connectivity = 8;
-        double [] costs_tmp = new double[connectivity];
+        double costs_tmp[] = new double[connectivity];
         coord updated = new coord(-1, -1);
 
         for (int ii = 0; ii < connectivity; ii++)
             costs_tmp[ii] = Double.POSITIVE_INFINITY;
 
         if (i - 1 >= 0 && explored.contains(new coord(i - 1, j))) {
-            // costs_tmp[0] = map[i - 1][j];
             System.out.println( (i-1) + " " + j);
             explored.remove(new coord(i - 1, j));
             costs_tmp[0] = evaluateFunction(new coord(i - 1, j), goal); }
 
         if (i + 1 < M && explored.contains(new coord(i + 1, j))) {
-            // costs_tmp[1] = map[i + 1][j];
             System.out.println( (i+1) + " " + j);
             explored.remove(new coord(i + 1, j));
             costs_tmp[1] = evaluateFunction(new coord(i + 1, j), goal); }
 
         if (j - 1 >= 0 && explored.contains(new coord(i, j - 1))) {
-            // costs_tmp[2] = map[i][j - 1];
             System.out.println(i + " " + (j-1));
             explored.remove(new coord(i, j - 1));
             costs_tmp[2] = evaluateFunction(new coord(i, j - 1), goal); }
 
         if (j + 1 < N && explored.contains(new coord(i, j + 1))) {
-            // costs_tmp[3] = map[i][j + 1];
             System.out.println(i + " " + (j+1));
             explored.remove(new coord(i, j + 1));
             costs_tmp[3] = evaluateFunction(new coord(i, j + 1), goal); }
 
         if (i - 1 >= 0 && explored.contains(new coord(i - 1, j - 1))) {
-            // costs_tmp[4] = map[i - 1][j - 1];
             System.out.println((i-1) + " " + (j-1));
             explored.remove(new coord(i - 1, j - 1));
             costs_tmp[4] = evaluateFunction(new coord(i - 1, j - 1), goal);}
 
         if (i - 1 >= 0 && explored.contains(new coord(i - 1, j + 1))) {
-            // costs_tmp[5] = map[i - 1][j + 1];
             System.out.println((i - 1) + " " + (j + 1));
             explored.remove(new coord(i - 1, j + 1));
             costs_tmp[5] = evaluateFunction(new coord(i - 1, j + 1), goal); }
 
         if (i + 1 < M && explored.contains(new coord(i + 1, j - 1))) {
-            // costs_tmp[6] = map[i + 1][j - 1];
             System.out.println((i+1) + " " + (j-1) );
             explored.remove(new coord(i + 1, j - 1));
             costs_tmp[6] = evaluateFunction(new coord(i + 1, j - 1), goal); }
 
         if (i + 1 < M && explored.contains(new coord(i + 1, j + 1))) {
-            // costs_tmp[7] = map[i + 1][j + 1];
             System.out.println((i + 1) + " " + (j + 1));
             explored.remove(new coord(i + 1, j + 1));
             costs_tmp[7] = evaluateFunction(new coord(i + 1, j + 1), goal);}
 
         argmin = argmin(costs_tmp);
         System.out.println("argmin");
-        // for (int ii = 0; ii < costs_tmp.length; i++)
-        //     System.out.println(costs_tmp[ii]);
 
         if (argmin == -1) {
             System.out.println("ih rapaz");
-            // for (int ii = 0; ii < costs.length; i++)
-            //     System.out.println(costs[ii]);
-            // System.out.println(map[i - 1][j]);
-            // System.out.println(map[i + 1][j]);
-            // System.out.println(map[i][j - 1]);
-            // System.out.println(map[i][j + 1]);
         }
 
         if (argmin == 0) {
-            // map[i - 1][j] = -1;
             updated = new coord(i - 1, j);
         }
 
         if (argmin == 1) {
-            // map[i + 1][j] = -1;
             updated = new coord(i + 1, j);
         }
 
         if (argmin == 2) {
-            // map[i][j - 1] = -1;
             updated = new coord(i, j - 1);
         }
 
         if (argmin == 3) {
-            // map[i][j + 1] = -1;
             updated = new coord(i, j + 1);
         }
 
         if (argmin == 4) {
-            // map[i][j + 1] = -1;
             updated = new coord(i - 1, j - 1);
         }
 
         if (argmin == 5) {
-            // map[i][j + 1] = -1;
             updated = new coord(i - 1, j + 1);
         }
 
         if (argmin == 6) {
-            // map[i][j + 1] = -1;
             updated = new coord(i + 1, j - 1);
         }
 
         if (argmin == 7) {
-            // map[i][j + 1] = -1;
             updated = new coord(i + 1, j + 1);
         }
 
@@ -431,7 +401,6 @@ public class Discrete {
         path.add(goal);
         while (tmp.x() != i_init || tmp.y() != j_init) {
             tmp = updatePosWithMinValue(explored, tmp, goal);
-            // System.out.println("a treta está aqui");
             path.add(0, tmp);
         }
         return path;
@@ -475,7 +444,6 @@ public class Discrete {
             System.out.println("ué");
             for (coord n : getNeighbours(cur)) {
                 if (!explored.contains(n)) {
-                    //if (map[n.x()][n.y()] != -1 && map[n.x()][n.y()] > map[cur.x()][cur.y()] + 1) {
                     if (map[n.x()][n.y()] != -1 && checkIfCostDecreases(cur, n)) {
                         updateNeighbour(cur, n);
                         pq.add(n);
