@@ -39,14 +39,13 @@ public class Discrete {
     public static double [][] costs;
     public static double [][] probMap;
 
-    public static double custo0 = 0.0; // custo de manter-se na mesma direção
-    public static double custo1 = 0.25; // custo de girar 45 graus
-    public static double custo2 = 0.75; // custo de girar 90 graus
-    public static double custo3 = 0.1; // custo de girar 180 graus
-
-    public static double sumCosts = custo0 + custo1 + custo2 + custo3; // custo de girar 180 graus
+    public static double custo0; // custo de manter-se na mesma direção
+    public static double custo1; // custo de girar 45 graus
+    public static double custo2; // custo de girar 90 graus
+    public static double custo3; // custo de girar 180 graus
+    public static double sumCosts = custo0 + custo1 + custo2 + custo3;
     
-    public static double alpha = 0.2; // alpha da função de avaliação aditiva
+    public static double alpha; // alpha da função de avaliação aditiva
 
     public static Point[] points = {
         new Point(100,813),    /* P1 */
@@ -88,7 +87,7 @@ public class Discrete {
     Rectangle bounds = new Rectangle(0, 0, 1195, 920);
     LineMap mymap = new LineMap(lines, bounds);
 
-    public Discrete (double w, double h){
+    public Discrete (double w, double h, int nConv, double alpha, double custo0, double custo1, double custo2, double custo3){
         this.width 	= w;
         this.height = h;
         this.M = (int) Math.ceil(1195.0/h);
@@ -97,10 +96,13 @@ public class Discrete {
         this.costs = new double[this.M][this.N];
         this.probMap = new double[this.M][this.N];
 
-        this.custo0 = this.custo0/this.sumCosts;
-        this.custo1 = this.custo1/this.sumCosts;
-        this.custo2 = this.custo2/this.sumCosts;
-        this.custo3 = this.custo3/this.sumCosts;
+        this.sumCosts = custo0 + custo1 + custo2 + custo3;
+        this.custo0 = custo0/this.sumCosts;
+        this.custo1 = custo1/this.sumCosts;
+        this.custo2 = custo2/this.sumCosts;
+        this.custo3 = custo3/this.sumCosts;
+
+        this.alpha = alpha;
 
         for (int i = 0; i < map.length; i++) {
             for (int j = 0; j < map[i].length; j++) {
@@ -112,10 +114,10 @@ public class Discrete {
 
         populateMap();
 
-        // Três convoluções
-        probabilistic();
-        probabilistic();
-        probabilistic();
+        // Convolutions
+
+        for (int i = 0; i < nConv; i++)
+            probabilistic();
     }
 
     public double get_w (){
@@ -576,8 +578,14 @@ public class Discrete {
     public static void main(String[] args) {
 
         int size = 50;
+        int nConv = 3;
+        double alpha = 0.2;
+        double custo0 = 0.0;
+        double custo1 = 0.25;
+        double custo2 = 0.5;
+        double custo3 = 1;
 
-        Discrete dsc = new Discrete (size, size);
+        Discrete dsc = new Discrete (size, size, nConv, alpha, custo0, custo1, custo2, custo3);
 
         // coord init = pointAsCoord(1, size);
         // coord goal = pointAsCoord(10, size);
