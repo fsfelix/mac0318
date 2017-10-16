@@ -39,12 +39,14 @@ public class Discrete {
     public static double [][] costs;
     public static double [][] probMap;
 
-    public static double custo0 = 0; // custo de manter-se na mesma direção
+    public static double custo0 = 0.0; // custo de manter-se na mesma direção
     public static double custo1 = 0.25; // custo de girar 45 graus
-    public static double custo2 = 0.5; // custo de girar 90 graus
-    public static double custo3 = 1; // custo de girar 180 graus
+    public static double custo2 = 0.75; // custo de girar 90 graus
+    public static double custo3 = 0.1; // custo de girar 180 graus
 
-    public static double alpha = 0; // alpha da função de avaliação aditiva
+    public static double sumCosts = custo0 + custo1 + custo2 + custo3; // custo de girar 180 graus
+    
+    public static double alpha = 0.2; // alpha da função de avaliação aditiva
 
     public static Point[] points = {
         new Point(100,813),    /* P1 */
@@ -77,7 +79,7 @@ public class Discrete {
 
         /* Pentagon */
         new Line(335,345,502,155),
-        new Line(502,155,700,225),   // base do pentágono!
+        //        new Line(502,155,700,225),   // base do pentágono!
         new Line(700,225, 725,490),
         new Line(725,490,480,525),
         new Line(480,525,335,345),
@@ -94,6 +96,11 @@ public class Discrete {
         this.map = new double[this.M][this.N];
         this.costs = new double[this.M][this.N];
         this.probMap = new double[this.M][this.N];
+
+        this.custo0 = this.custo0/this.sumCosts;
+        this.custo1 = this.custo1/this.sumCosts;
+        this.custo2 = this.custo2/this.sumCosts;
+        this.custo3 = this.custo3/this.sumCosts;
 
         for (int i = 0; i < map.length; i++) {
             for (int j = 0; j < map[i].length; j++) {
@@ -401,11 +408,14 @@ public class Discrete {
         int N = map[0].length;
         double h = distance(n, goal)/distance(new coord(0,0), new coord(M - 1, N - 1));
         double p = probMap[n.x()][n.y()];
-        double c = costs[n.x()][n.y()]/(M * N);
+        //double c = costs[n.x()][n.y()]/(M * N);
+        double c = costs[n.x()][n.y()]/(sumCosts);
+
         //double alpha = 1;
-        // System.out.println("h " + h);
-        // System.out.println("p " + p);
-        // System.out.println("c " + c);
+        System.out.println("h " + h);
+        System.out.println("p " + p);
+        System.out.println("c " + c);
+        System.out.println(alpha*c + (1-alpha)*p + h);
         // System.out.println("aqui dentro dando infinito? " + (c*p+h));
         //return c*p + h;
         return alpha*c + (1-alpha)*p + h;
@@ -620,7 +630,7 @@ public class Discrete {
         // coord goal = pointAsCoord(10, size);
 
         coord init = pointAsCoord(1, size);
-        coord goal = pointAsCoord(10, size);
+        coord goal = pointAsCoord(9, size);
 
         drawMatrix();
         drawPoint(init);
