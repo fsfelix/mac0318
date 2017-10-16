@@ -1,0 +1,41 @@
+Felipe Silva Felix - 8941092
+Lucas Helfstein - 8802426
+
+
+Parte A
+-------
+
+Para rodar no robo:
+
+nxjpcc MasterNav.java
+./runner.sh SlaveNav
+
+Para rodar no computador:
+
+nxjpcc Teste.java && nxjpc Teste
+
+Parte B
+-------
+
+Para rodar no robo:
+
+nxjpcc MasterNav.java
+./runner.sh SlaveNav
+
+Para rodar no computador:
+
+nxjpcc Discrete.java && nxjpc Discrete
+
+
+Parte C
+-------
+
+Para rodar no robo:
+
+nxjpcc MasterNav.java
+./runner.sh SlaveNav
+
+Para rodar no computador:
+
+nxjpcc Discrete.java && nxjpc Discrete
+

@@ -46,7 +46,8 @@ public class Teste {
         graph.addBothEdges(10, 9, distance(points[10].x, points[10].y, points[9].x, points[9].y));
 
         graph.printGraph();
-        path = graph.BestChoice(0, 9);
+        //path = graph.BestChoice(0, 9);
+        path = graph.A_Star(0, 9);
 
         int[] intArray = new int[path.size()];
 
