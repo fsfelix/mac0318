@@ -127,24 +127,25 @@ public class MasterNav {
         // e assim por diante.
 
         path = graph.BestChoice(10, 0);
+        //path = graph.A_Star(10, 0);
 
         int[] trajetoria = new int[path.size()];
-    
+
         for (int i = 0; i < trajetoria.length; i++) {
             trajetoria[i] = path.get(i) + 1;
-            System.out.println(trajetoria[i]);      
-        }        
+            System.out.println(trajetoria[i]); 
+        }
 
 
         Button.waitForAnyPress();
         master.sendCommand((byte) 3, points[trajetoria[0]-1].x/10, points[trajetoria[0]-1].y/10);
-        
+
         for (int i = 0; i < trajetoria.length; i++)
             {
                 ret = master.sendCommand((byte) 0, points[trajetoria[i] - 1].x/10, points[trajetoria[i] - 1].y/10);
                 Delay.msDelay(100);
             }
-        
+
         ret = master.sendCommand((byte) 1, -1, -1);
         int num = scan.nextInt();
     }
