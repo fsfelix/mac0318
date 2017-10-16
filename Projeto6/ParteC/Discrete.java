@@ -334,16 +334,6 @@ public class Discrete {
             costs[n_i][n_j] = costs[c_i][c_j] + custo3;
         }
 
-        // if (current.x() != n.x() && current.y() != n.y()) {
-        //     map[n.x()][n.y()] = map[current.x()][current.y()] + Math.sqrt(2);
-        //     costs[n.x()][n.y()] = costs[current.x()][current.y()] + Math.sqrt(2);
-        // }
-        // else {
-        //     //map[n.x()][n.y()] += map[current.x()][current.y()] + 1;
-        //     map[n.x()][n.y()] = map[current.x()][current.y()] + 1;
-        //     costs[n.x()][n.y()] = costs[current.x()][current.y()] + 1;
-        // }
-
     }
 
     public static boolean checkIfCostDecreases(coord current, coord n, int poseAtual) {
@@ -383,19 +373,6 @@ public class Discrete {
                 return false;
         }
         return false;
-        // if (c_i != n_i && c_j != n_j) {
-        //     if (map[n_i][n_j] > map[c_i][c_j] + Math.sqrt(2))
-        //         return true;
-        //     else
-        //         return false;
-        // }
-
-        // else {
-        //     if (map[n_i][n_j] > map[c_i][c_j] + 1)
-        //         return true;
-        //     else
-        //         return false;
-        // }
 
     }
 
@@ -408,16 +385,8 @@ public class Discrete {
         int N = map[0].length;
         double h = distance(n, goal)/distance(new coord(0,0), new coord(M - 1, N - 1));
         double p = probMap[n.x()][n.y()];
-        //double c = costs[n.x()][n.y()]/(M * N);
         double c = costs[n.x()][n.y()]/(sumCosts);
 
-        //double alpha = 1;
-        System.out.println("h " + h);
-        System.out.println("p " + p);
-        System.out.println("c " + c);
-        System.out.println(alpha*c + (1-alpha)*p + h);
-        // System.out.println("aqui dentro dando infinito? " + (c*p+h));
-        //return c*p + h;
         return alpha*c + (1-alpha)*p + h;
     }
 
@@ -471,17 +440,10 @@ public class Discrete {
             explored.add(cur);
             for (coord n : getNeighbours(cur)) {
                 if (!explored.contains(n)) {
-                    //if (map[n.x()][n.y()] != -1 && map[n.x()][n.y()] > map[cur.x()][cur.y()] + 1) {
                     if (map[n.x()][n.y()] != -1 && checkIfCostDecreases(cur, n, pose)) {
                         updateNeighbour(cur, n, pose);
-
-                        //System.out.println("pose antiga: " + pose + " pose nova " + nextPose(cur, n));
-                        // pose = nextPose(cur, n);
                         pq.add(n);
-                        // System.out.println(n.x() + " neigh " +n.y());
-                        // System.out.println(cur.x() + " current " +cur.y());
                         prev[n.x()][n.y()] = cur;
-                        //   }
                         if (n.equals(goal)) {
                             found = true;
                             explored.add(goal);
@@ -502,13 +464,10 @@ public class Discrete {
         coord tmp = goal;
         path.add(goal);
         while (tmp.x() != init.x() || tmp.y() != init.y()) {
-            //System.out.println(tmp.x() + " " + tmp.y());
             tmp = prev[tmp.x()][tmp.y()];
-            //System.out.println(tmp.x() + " " + tmp.y());
             path.add(0, tmp);
         }
 
-        // ArrayList <coord> path = getPath(explored, init, goal);
         for (coord c : path)
             System.out.println(c.x() + " " + c.y());
         drawPath(path);
@@ -524,8 +483,6 @@ public class Discrete {
             int i = c.x();
             int j = c.y();
             StdDraw.point((double)i/(double)M + RADIUS/2, (double)j/N + RADIUS/2);
-            //StdDraw.filledSquare((double)i/(double)M + RADIUS/2, (double)j/N + RADIUS/2, RADIUS);
-
         }
     }
 
@@ -539,9 +496,6 @@ public class Discrete {
 
         for (int i = 0; i < M; i++) {
             for (int j = 0; j < N; j++) {
-                // System.out.println(map[i][j]);
-                // System.out.println("COR: " + Math.round(map[i][j]*127.0));
-                // int tom = (int)Math.round((float)(1.0/(float)map[i][j])*127.0);
                 int tom = (int) (255 - probMap[i][j]*255);
                 if (tom > 255)
                     tom = 255;
@@ -551,7 +505,6 @@ public class Discrete {
                 StdDraw.setPenColor(tom, tom, tom);
 
                 StdDraw.point((double)i/(double)M + RADIUS/2, (double)j/N + RADIUS/2);
-                //StdDraw.filledSquare((double)i/(double)M + RADIUS/2, (double)j/N + RADIUS/2, RADIUS);
 
             }
         }
@@ -625,7 +578,7 @@ public class Discrete {
         int size = 50;
 
         Discrete dsc = new Discrete (size, size);
-        
+
         // coord init = pointAsCoord(1, size);
         // coord goal = pointAsCoord(10, size);
 
