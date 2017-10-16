@@ -44,7 +44,7 @@ public class Discrete {
     public static double custo2; // custo de girar 90 graus
     public static double custo3; // custo de girar 180 graus
     public static double sumCosts = custo0 + custo1 + custo2 + custo3;
-    
+
     public static double alpha; // alpha da função de avaliação aditiva
 
     public static Point[] points = {
@@ -404,7 +404,7 @@ public class Discrete {
         return argmin;
     }
 
-    public static void aStar(coord init, coord goal) {
+    public static ArrayList<coord> aStar(coord init, coord goal) {
         int M = map.length;
         int N = map[0].length;
 
@@ -473,6 +473,7 @@ public class Discrete {
         for (coord c : path)
             System.out.println(c.x() + " " + c.y());
         drawPath(path);
+        return path;
     }
 
     public static void drawPath(ArrayList <coord> path) {
@@ -585,6 +586,8 @@ public class Discrete {
         double custo2 = 0.5;
         double custo3 = 1;
 
+        ArrayList <coord> path = new ArrayList <coord> ();
+
         Discrete dsc = new Discrete (size, size, nConv, alpha, custo0, custo1, custo2, custo3);
 
         // coord init = pointAsCoord(1, size);
@@ -596,6 +599,6 @@ public class Discrete {
         drawMatrix();
         drawPoint(init);
         drawPoint(goal);
-        aStar(init, goal);
+        path = aStar(init, goal);
     }
 }

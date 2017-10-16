@@ -17,7 +17,7 @@ public class Discrete {
     public static double [][] costs;
     public static double [][] probMap;
 
-    public static double alpha = 1;                         // alpha da função de avaliação aditiva
+    public static double alpha;                         // alpha da função de avaliação aditiva
 
     public static Point[] points = {
         new Point(100,813),                                 /* P1 */
@@ -50,7 +50,7 @@ public class Discrete {
 
         /* Pentagon */
         new Line(335,345,502,155),
-        new Line(502,155,700,225),                           // base do pentágono!
+        //new Line(502,155,700,225),                           // base do pentágono!
         new Line(700,225, 725,490),
         new Line(725,490,480,525),
         new Line(480,525,335,345),
@@ -59,7 +59,7 @@ public class Discrete {
     Rectangle bounds = new Rectangle(0, 0, 1195, 920);
     LineMap mymap = new LineMap(lines, bounds);
 
-    public Discrete (double w, double h){
+    public Discrete (double w, double h, int nConv, double alpha){
         this.width 	= w;
         this.height = h;
         this.M = (int) Math.ceil(1195.0/h);
@@ -67,6 +67,8 @@ public class Discrete {
         this.map = new double[this.M][this.N];
         this.costs = new double[this.M][this.N];
         this.probMap = new double[this.M][this.N];
+
+        this.alpha = alpha;
 
         for (int i = 0; i < map.length; i++) {
             for (int j = 0; j < map[i].length; j++) {
@@ -78,10 +80,8 @@ public class Discrete {
 
         populateMap();
 
-        // Três convoluções
-        probabilistic();
-        probabilistic();
-        probabilistic();
+        for (int i = 0; i < nConv; i++)
+            probabilistic();
     }
 
     public double get_w (){
@@ -437,7 +437,7 @@ public class Discrete {
         return path;
     }
 
-    public static void aStar(coord init, coord goal) {
+    public static ArrayList<coord> aStar(coord init, coord goal, boolean linearize) {
         int M = map.length;
         int N = map[0].length;
 
@@ -501,15 +501,19 @@ public class Discrete {
 
         /************************************************************/
 
-        path = linearizePath(path, 50, 50);
-        drawLinearizedPath(path);
-
+        if (linearize) {
+            path = linearizePath(path, 50, 50);
+            drawLinearizedPath(path);
+        }
+        else
+            drawPath(path);
         /************************************************************/
 
         // ArrayList <coord> path = getPath(explored, init, goal);
         for (coord c : path)
             System.out.println(c.x() + " " + c.y());
-        // drawPath(path);
+
+        return path;
     }
 
     public static void drawPath(ArrayList <coord> path) {
@@ -636,18 +640,23 @@ public class Discrete {
     public static void main(String[] args) {
 
         int size = 50;
+        int nConv = 3;
+        double alpha = 0.5;
+        ArrayList <coord> path = new ArrayList <coord> ();
 
-        Discrete dsc = new Discrete (size, size);
-        
+        Discrete dsc = new Discrete (size, size, nConv, alpha);
+
         // coord init = pointAsCoord(1, size);
         // coord goal = pointAsCoord(10, size);
 
         coord init = pointAsCoord(1, size);
-        coord goal = pointAsCoord(9, size);
+        coord goal = pointAsCoord(10, size);
+
+        boolean linearize = false;
 
         drawMatrix();
         drawPoint(init);
         drawPoint(goal);
-        aStar(init, goal);
+        path = aStar(init, goal, linearize);
     }
 }
