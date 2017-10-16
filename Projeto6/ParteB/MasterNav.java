@@ -108,14 +108,24 @@ public class MasterNav {
         /*******************************************************************************************************/
 
         int SR = 50;
-        boolean linearize = true;
+        int nConv = 3;
+        double alpha = 0.5;
+        boolean linearize = false;
 
         ArrayList <coord> path = new ArrayList <coord> ();
         ArrayList <Point> finalPoints = new ArrayList <Point> (); 
-        Discrete dsc = new Discrete (SR, SR);
 
-        widthSearch wS = new widthSearch();
-        path = wS.frenteDeOnda(SR, points[10], points[0], linearize);
+        Discrete dsc = new Discrete (SR, SR, nConv, alpha);
+
+
+        // Escolha os pontos inicio e meta
+        coord init = dsc.pointAsCoord(1, SR);
+        coord goal = dsc.pointAsCoord(10, SR);
+
+        dsc.drawMatrix();
+        dsc.drawPoint(init);
+        dsc.drawPoint(goal);
+        path = dsc.aStar(init, goal, linearize);
 
         finalPoints = dsc.xyToMap(path, SR, SR);
 

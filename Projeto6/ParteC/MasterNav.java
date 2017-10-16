@@ -108,14 +108,31 @@ public class MasterNav {
         /*******************************************************************************************************/
 
         int SR = 50;
-        boolean linearize = true;
+        int nConv = 3;
+        double alpha = 0.5;
+        boolean linearize = false;
+
+        // Custos dos movimentos, abra o Discrete.java e veja o cabeçalho
+        double custo0 = 0.0;
+        double custo1 = 0.25;
+        double custo2 = 0.5;
+        double custo3 = 1;
+
 
         ArrayList <coord> path = new ArrayList <coord> ();
         ArrayList <Point> finalPoints = new ArrayList <Point> (); 
-        Discrete dsc = new Discrete (SR, SR);
 
-        widthSearch wS = new widthSearch();
-        path = wS.frenteDeOnda(SR, points[10], points[0], linearize);
+        Discrete dsc = new Discrete (SR, SR, nConv, alpha, custo0, custo1, custo2, custo3);
+
+
+        // Escolha os pontos inicio e meta
+        coord init = dsc.pointAsCoord(1, SR);
+        coord goal = dsc.pointAsCoord(10, SR);
+
+        dsc.drawMatrix();
+        dsc.drawPoint(init);
+        dsc.drawPoint(goal);
+        path = dsc.aStar(init, goal);
 
         finalPoints = dsc.xyToMap(path, SR, SR);
 
