@@ -54,8 +54,8 @@ public class Teste {
         graph.addBothEdges(10, 9, distance(points[10].x, points[10].y, points[9].x, points[9].y));
 
         graph.printGraph();
-        path = graph.Dijkstra(0, 9);
-        
+        path = graph.Dijkstra(0, 7);
+
         int[] intArray = new int[path.size()];
 
         for (int i = 0; i < intArray.length; i++) {
