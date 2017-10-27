@@ -41,12 +41,14 @@ def distTo(line, x1, y1):
 def extract_lines(line, points, thres, res):
     if (len(points) == 0):
         res += [line]
+        # tem que pensar melhor neste caso: quando não tem mais nenhum ponto...
         return
 
     max_dist = -1
 
     for p in points:
         dist = distTo(line, p[0], p[1])
+        #print(dist)
         if (dist > max_dist):
             max_dist = dist
             p_max = p
@@ -130,7 +132,7 @@ def main():
 
     all_points = []
     lines_res = []
-    thres = 4
+    thres = 5
 
     while True:
         poseLine = f.readline()
@@ -149,6 +151,7 @@ def main():
         all_points += euc
 
     # aqui eu tentava gerar as linhas a partir de todos os pontos
+    # mas ficava pior que o gerado para cada leitura de sonar..
     #res = init_extract(all_points, 1)
 
     toJava(lines_res)
