@@ -1,0 +1,12 @@
+
+(O código em python gera automaticamente o arquivo
+drawMap.java)
+
+Rode os seguintes comandos:
+
+python3 createMap.py
+nxjpcc drawMap.java
+nxjpc drawMap
+
+O arquivo .svg estará salvo nesta mesma pasta
+com o nome 'mapaFlipY.svg'.

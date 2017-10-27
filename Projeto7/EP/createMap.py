@@ -24,7 +24,7 @@ class Line:
             self.c = (self.m*x0) - y0
 
     def toLineJava(self):
-        return "new Line({}, {}, {}, {})".format(self.x0, self.y0, self.x1, self.y1)
+        return "new Line((float) {}, (float) {}, (float) {}, (float) {})".format(self.x0, self.y0, self.x1, self.y1)
 
     def __str__(self):
         return "{}x + {}y + {} = 0".format(self.a, self.b, self.c)
@@ -63,15 +63,31 @@ def extract_lines(line, points, thres, res):
         res += [line]
     return
 
+# Gera o código em java já compilável pelo nxjpcc
+
 def toJava(lines):
-    print("Line[] lines = {")
+    java = open("drawMap.java", "w+")
+    java.write("import java.util.ArrayList;\n")
+    java.write("import java.util.Collections;\n")
+    java.write("import lejos.geom.*;\n")
+    java.write("import lejos.robotics.mapping.LineMap;\n")
+
+    #print("static Line[] lines = {")
+    java.write("public class drawMap {\n")
+    java.write("static Line[] lines = {\n")
 
     for i in range(len(lines)-1):
         l = lines[i]
-        print(l.toLineJava() + ',')
+        #print(l.toLineJava() + ',')
+        java.write(l.toLineJava() + ',' + '\n')
     l = lines[len(lines) - 1]
-    print(l.toLineJava())
-    print('};')
+    java.write(l.toLineJava() + '\n')
+    java.write('}; \n')
+
+    maincode = open('main.txt')
+    for line in maincode:
+        java.write(line)
+    java.write('} \n')
 
 
 def init_extract(points, thres):
@@ -112,7 +128,10 @@ def main():
 
     f = open(FILE_DIR)
 
-    euclidian_points = []
+    all_points = []
+    lines_res = []
+    thres = 4
+
     while True:
         poseLine = f.readline()
         pointsLine = f.readline()
@@ -126,10 +145,12 @@ def main():
         pose = [float(poseSplit[i]) for i in ( range(len(poseSplit) - 1))]
         points = [float(pointsSplit[i]) for i in (range(len(pointsSplit) - 1))]
         euc = polarToEuclidian(pose, points)
-        euclidian_points += euc
+        lines_res += init_extract(euc, thres)
+        all_points += euc
 
-    res = init_extract(euclidian_points, 2)
+    # aqui eu tentava gerar as linhas a partir de todos os pontos
+    #res = init_extract(all_points, 1)
 
-    toJava(res)
+    toJava(lines_res)
 
 main()
