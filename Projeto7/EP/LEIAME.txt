@@ -12,5 +12,6 @@ O arquivo .svg estará salvo nesta mesma pasta
 com o nome 'mapaFlipY.svg'.
 
 
-Estou fazendo um pequeno relatório mostrando as tentativas para obter resultados em: https://www.overleaf.com/11869548yyndxfrhvzzk#/44983950/
+Estou fazendo um pequeno relatório mostrando as tentativas para obter resultados em: https://www.overleaf.com/11869548yyndxfrhvzzk
 
+O arquivo sonar_fixado.txt está com os X e Y da pose trocados, como comentei no Telegram.

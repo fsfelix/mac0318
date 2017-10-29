@@ -239,11 +239,11 @@ def main():
     FIRST_DIR = "sonar_primeiro_scan.txt"
     SECOND_DIR = "sonar_segundo_scan.txt"
 
-    f = open(FIRST_DIR)
+    f = open(FILE_DIR)
 
     all_points = []
     lines_res = []
-    thres = 10
+    thres = 0
 
     cont = 0
 
@@ -267,10 +267,8 @@ def main():
         all_points += euc
         
     # devemos gerar as linhas após todos os pontos, pois temos mais informação sobre o mundo real     
-    lines_res = init_extract(all_points, thres)
-    
-
-    # lines_res = init_extract_with_labels(all_points, thres)
+    lines_res = init_extract_with_labels(all_points, thres)
+    toJava(lines_res)    
     
     # all_points = [(1.0, 1.0), (2.0, 1.0), (1.0, 2.0), (2.0, 2.0)]
     # for i in range(0, 100):
@@ -297,8 +295,6 @@ def main():
     # lines_res = init_extract2(all_points, 3)
     
     # plotLines (lines_res)
-
-    toJava(lines_res)
 
 
 main()
