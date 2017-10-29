@@ -10,3 +10,7 @@ nxjpc drawMap
 
 O arquivo .svg estará salvo nesta mesma pasta
 com o nome 'mapaFlipY.svg'.
+
+
+Estou fazendo um pequeno relatório mostrando as tentativas para obter resultados em: https://www.overleaf.com/11869548yyndxfrhvzzk#/44983950/
+

@@ -243,7 +243,7 @@ def main():
 
     all_points = []
     lines_res = []
-    thres = 50
+    thres = 10
 
     cont = 0
 
