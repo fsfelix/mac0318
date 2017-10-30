@@ -63,33 +63,27 @@ def distTo(line, x1, y1):
     return num / den
 
 def extract_lines(line, points, thres, res):
-    
     if (len(points) == 0):
         res += [line]
         return
-    
     max_dist = -1
-
-    for p in points:
-
+    for i in range(len(points)):
+        p = points[i]
         dist = distTo(line, p[0], p[1])
-        
         if (dist > max_dist):
             max_dist = dist
             p_max = p
+            i_max = i
 
     if max_dist > thres:
-        
         line1 = Line(line.x0, line.y0, p_max[0], p_max[1])
         line2 = Line(p_max[0], p_max[1], line.x1, line.y1)
 
         points.remove(p_max)
-        extract_lines(line1, points, thres, res)
-        extract_lines(line2, points, thres, res)
-    
+        extract_lines(line1, points[:i_max], thres, res)
+        extract_lines(line2, points[i_max + 1:], thres, res)
     else:
         res += [line]
-    
     return
 
 def extract_lines_with_labels(line, points, thres, res, start, end):
@@ -155,7 +149,6 @@ def euclideanDist(p1, p2):
     return math.sqrt((p1[0] - p2[0]) * (p1[0] - p2[0]) + (p1[1] - p2[1]) * (p1[1] - p2[1]))
 
 def mostDistantPoint(points):
-    
     x = 0
     p0 = points[0]
     points.remove(p0)
@@ -178,7 +171,6 @@ def polarToEuclidian(pose, points, cont):
     for i in range(len(points)):
         x_tmp = x0 + points[i]*math.cos(math.radians(teta + (-90 + i*2)))
         y_tmp = y0 + points[i]*math.sin(math.radians(teta + (-90 + i*2)))
-
         x = x_tmp*math.cos(math.radians(teta)) + y_tmp*math.sin(math.radians(teta))
         y = -x_tmp*math.sin(math.radians(teta)) + y_tmp*math.cos(math.radians(teta))
 
@@ -243,7 +235,7 @@ def main():
 
     all_points = []
     lines_res = []
-    thres = 0
+    thres = 20
 
     cont = 0
 
@@ -265,11 +257,35 @@ def main():
         cont = cont + 1
 
         all_points += euc
-        
-    # devemos gerar as linhas após todos os pontos, pois temos mais informação sobre o mundo real     
-    lines_res = init_extract_with_labels(all_points, thres)
-    toJava(lines_res)    
-    
+
+    # devemos gerar as linhas após todos os pontos, pois temos mais informação sobre o mundo real
+    #lines_res = init_extract_with_labels(all_points, thres)
+    lines_res = init_extract(all_points, thres)
+
+    vmin = 100000000
+    vmax = -100000000
+    for l in lines_res:
+        if l.x0 > vmax:
+            vmax = l.x0
+        if l.x0 < vmin:
+            vmin = l.x0
+        if l.x1 < vmin:
+            vmin = l.x1
+        if l.x1 > vmax:
+            vmax = l.x1
+        if l.y0 > vmax:
+            vmax = l.y0
+        if l.y0 < vmin:
+            vmin = l.y0
+        if l.y1 < vmin:
+            vmin = l.y1
+        if l.y1 > vmax:
+            vmax = l.y1
+
+    print(vmin)
+    print(vmax)
+    toJava(lines_res)
+
     # all_points = [(1.0, 1.0), (2.0, 1.0), (1.0, 2.0), (2.0, 2.0)]
     # for i in range(0, 100):
     #     all_points.append(( 1 + (i / 100) , 2 + (-i / 100) ))
@@ -288,13 +304,11 @@ def main():
     #               (6.0, 2.0),
     #               (6.0, 1.0)]
     # lines_res = init_extract2(all_points, 3)
-    
+
     # plottingPositive(all_points)
-    
+
     # all_points = [(1.0, 2.0), (2.0, 4.0), (3.0, 1.0), (2.5, 10.0), (5.0, 5.0)]
     # lines_res = init_extract2(all_points, 3)
-    
+
     # plotLines (lines_res)
-
-
 main()
