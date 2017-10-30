@@ -100,19 +100,6 @@ def init_extract(points, thres):
 def euclideanDist(p1, p2):
     return math.sqrt((p1[0] - p2[0]) * (p1[0] - p2[0]) + (p1[1] - p2[1]) * (p1[1] - p2[1]))
 
-def mostDistantPoint(points):
-    x = 0
-    p0 = points[0]
-    points.remove(p0)
-
-    for point in points:
-        if euclideanDist(p0, point) > x:
-            x = euclideanDist(p0, point)
-            mostDistant = point
-
-    points.remove(mostDistant)
-    return p0, mostDistant
-
 def polarToEuclidian(pose, points, cont):
     euclidianPoints = []
 
