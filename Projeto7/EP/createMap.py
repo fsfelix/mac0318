@@ -3,7 +3,7 @@ import sys
 
 class Line:
     def __init__(self, x0, y0, x1, y1):
-        # print("x0 = {}, y0 = {}, x1 = {}, y1 = {}".format(x0, y0, x1, y1))
+
         if (x0 == x1):
             self.m = math.inf
             self.x0 = x0
