@@ -123,9 +123,11 @@ def polarToEuclidian(pose, points, cont):
     for i in range(len(points)):
         x_tmp = x0 + points[i]*math.cos(math.radians(teta + (-90 + i*2)))
         y_tmp = y0 + points[i]*math.sin(math.radians(teta + (-90 + i*2)))
-        x = x_tmp*math.cos(math.radians(teta)) + y_tmp*math.sin(math.radians(teta))
-        y = -x_tmp*math.sin(math.radians(teta)) + y_tmp*math.cos(math.radians(teta))
+        # x = x_tmp*math.cos(math.radians(teta)) + y_tmp*math.sin(math.radians(teta))
+        # y = -x_tmp*math.sin(math.radians(teta)) + y_2tmp*math.cos(math.radians(teta))
 
+        x = x_tmp*math.cos(math.radians(teta)) - y_tmp*math.sin(math.radians(teta)) + x0
+        y = x_tmp*math.sin(math.radians(teta)) + y_tmp*math.cos(math.radians(teta)) + y0
         euclidianPoints.append((x, y, (cont * 90 + i)))  # um numero adicionado para cada ponto lido, testando isso
 
     return euclidianPoints
