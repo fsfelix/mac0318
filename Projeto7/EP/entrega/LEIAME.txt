@@ -1,0 +1,21 @@
+Felipe Silva Felix - 8941092
+Lucas Helfstein - 8802426
+
+
+(O código em python gera automaticamente o arquivo
+drawMap.java)
+
+O threshold para o algoritmo está definido na função main() do arquivo
+createMap.py.
+
+Rode os seguintes comandos:
+
+python3 createMap.py sonar_labirinto.txt
+nxjpcc drawMap.java
+nxjpc drawMap
+
+O arquivo .svg estará salvo nesta mesma pasta
+com o nome 'mapaSemFlipY.svg' e 'mapaFlipY'.
+
+
+
