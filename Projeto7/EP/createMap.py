@@ -121,7 +121,7 @@ def polarToEuclidian(pose, points, cont):
 
 def main():
     FILE_DIR = sys.argv[1]
-    thres = 20 # threshold do algoritmo
+    thres = 0.5 # threshold do algoritmo
 
     f = open(FILE_DIR)
 
