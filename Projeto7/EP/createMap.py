@@ -1,4 +1,5 @@
 import math
+import sys
 
 class Line:
     def __init__(self, x0, y0, x1, y1):
@@ -86,40 +87,6 @@ def extract_lines(line, points, thres, res):
         res += [line]
     return
 
-def extract_lines_with_labels(line, points, thres, res, start, end):
-    
-    if (len(points) == 0):
-        # quando não tem mais nenhum ponto, essa reta tem que entrar
-        res += [line]
-        return
-    
-    max_dist = -1
-    mid = 0
-
-    # Checa se o ponto está no conjunto permitido de rotulos, se sim calcula distancia
-    for p in points:
-        if start <= p[2] and p[2] < end:
-            dist = distTo(line, p[0], p[1])
-            if (dist > max_dist):
-                max_dist = dist
-                p_max = p
-                mid = p[2]
-
-    if max_dist > thres:
-        
-        line1 = Line(line.x0, line.y0, p_max[0], p_max[1])
-        line2 = Line(p_max[0], p_max[1], line.x1, line.y1)
-        points.remove(p_max)
-
-        print("Chamada para mid: ", mid )
-        extract_lines_with_labels(line, points, thres, res, 0, mid)
-        extract_lines_with_labels(line, points, thres, res, mid, len(points))
-        
-    else:
-        res += [line]
-
-    return
-
 def init_extract(points, thres):
     p0 = points[0]
     pn = points[len(points) - 1]
@@ -128,21 +95,6 @@ def init_extract(points, thres):
     line = Line(p0[0], p0[1], pn[0], pn[1])
     res = []
     extract_lines(line, points, thres, res)
-    return res
-
-def init_extract2(points, thres):
-    # comeca a extrair linhas comecando com os dois pontos mais distantes
-    p0, pn = mostDistantPoint(points)
-    line = Line(p0[0], p0[1], pn[0], pn[1])
-    res = []
-    extract_lines(line, points, thres, res)
-    return res
-
-def init_extract_with_labels(points, thres):
-    p0, pn = mostDistantPoint(points)
-    line = Line(p0[0], p0[1], pn[0], pn[1])
-    res = []
-    extract_lines_with_labels(line, points, thres, res, 0, len(points))
     return res
 
 def euclideanDist(p1, p2):
@@ -178,64 +130,14 @@ def polarToEuclidian(pose, points, cont):
 
     return euclidianPoints
 
-def plotting(points):
-    # plotar uma nuvem de pontos
-    import matplotlib.pyplot as plt
-
-    x = []
-    y = []
-
-    for point in points:
-        x.append(point[0])
-        y.append(point[1])
-
-    plt.scatter(x, y)
-    plt.show()
-
-def plottingPositive(points):
-    # plotar uma nuvem de pontos do primeiro quadrante do plano cartesiano
-    import matplotlib.pyplot as plt
-    x = []
-    y = []
-    for point in points:
-        if point[0] > 0 and point[1] > 0:
-            x.append(point[0])
-            y.append(point[1])
-    plt.scatter(x, y)
-    plt.show()
-
-def plotALine(line):
-    # colocar uma linha no plot
-    import matplotlib.pyplot as plt
-    plt.plot([line.x0, line.x1], [line.y0, line.y1])
-
-def plotLines(lines):
-    # plotar varias linhas
-    import matplotlib.pyplot as plt
-    for line in lines:
-        plotALine(line)
-    plt.show()
-
-def positivePoints(points):
-    # retorna apenas os pontos que tem x e y positivos
-    positive = []
-    for point in points:
-        if point[0] > 0 and point[1] > 0:
-            positive.append(point)
-    return positive
-
 def main():
-
-    FILE_DIR = "sonar_labirinto.txt"
-    FIXED_DIR = "sonar_fixado.txt"
-    FIRST_DIR = "sonar_primeiro_scan.txt"
-    SECOND_DIR = "sonar_segundo_scan.txt"
+    FILE_DIR = sys.argv[1]
+    thres = 20 # threshold do algoritmo
 
     f = open(FILE_DIR)
 
     all_points = []
     lines_res = []
-    thres = 20
 
     cont = 0
 
@@ -259,56 +161,10 @@ def main():
         all_points += euc
 
     # devemos gerar as linhas após todos os pontos, pois temos mais informação sobre o mundo real
-    #lines_res = init_extract_with_labels(all_points, thres)
     lines_res = init_extract(all_points, thres)
 
-    vmin = 100000000
-    vmax = -100000000
-    for l in lines_res:
-        if l.x0 > vmax:
-            vmax = l.x0
-        if l.x0 < vmin:
-            vmin = l.x0
-        if l.x1 < vmin:
-            vmin = l.x1
-        if l.x1 > vmax:
-            vmax = l.x1
-        if l.y0 > vmax:
-            vmax = l.y0
-        if l.y0 < vmin:
-            vmin = l.y0
-        if l.y1 < vmin:
-            vmin = l.y1
-        if l.y1 > vmax:
-            vmax = l.y1
-
-    print(vmin)
-    print(vmax)
     toJava(lines_res)
 
-    # all_points = [(1.0, 1.0), (2.0, 1.0), (1.0, 2.0), (2.0, 2.0)]
-    # for i in range(0, 100):
-    #     all_points.append(( 1 + (i / 100) , 2 + (-i / 100) ))
 
-    # all_points = [(1.0, 5.0), (2.0, 5.0), (3.0, 5.0), (4.0, 4.0), 
-    #               (5.0, 3.0), (6.0, 5.0), (6.0, 2.0), (6.0, 1.0)]
-
-    # all_points = [(1.0, 5.0), 
-    #               (6.0, 5.0),
-    #               (6.0, 1.0)]
-    # lines_res = init_extract2(all_points, 3)
-
-    # all_points = [(1.0, 5.0),
-    #               (2.0, 5.0), 
-    #               (6.0, 5.0),
-    #               (6.0, 2.0),
-    #               (6.0, 1.0)]
-    # lines_res = init_extract2(all_points, 3)
-
-    # plottingPositive(all_points)
-
-    # all_points = [(1.0, 2.0), (2.0, 4.0), (3.0, 1.0), (2.5, 10.0), (5.0, 5.0)]
-    # lines_res = init_extract2(all_points, 3)
-
-    # plotLines (lines_res)
-main()
+if __name__ == "__main__":
+    main()

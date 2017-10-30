@@ -4,12 +4,12 @@ drawMap.java)
 
 Rode os seguintes comandos:
 
-python3 createMap.py
+python3 nomedoarquivo.txt createMap.py
 nxjpcc drawMap.java
 nxjpc drawMap
 
 O arquivo .svg estará salvo nesta mesma pasta
-com o nome 'mapaFlipY.svg'.
+com o nome 'mapaSemFlipY.svg'.
 
 
 Estou fazendo um pequeno relatório mostrando as tentativas para obter resultados em: https://www.overleaf.com/11869548yyndxfrhvzzk
