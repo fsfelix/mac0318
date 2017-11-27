@@ -3,3 +3,6 @@ Lucas Helfstein - 8802426
 
 Relatório: relatorio.pdf
 Instruções para rodar o código de probabilidades: relatorio.pdf
+Visualização dos resultados no nupyter notebook: Projeto8_novo_com_grafico_de_teta2.ipynb
+
+PS: lembrar da média dos Trues
