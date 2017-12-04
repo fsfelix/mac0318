@@ -23,8 +23,10 @@ public class MainProgram extends JPanel implements KeyListener, WindowListener {
 	*/
 	static private int BOX_DEPTH = 37; // profundidade da caixa
 	static private int WALL_DISTANCE = 80; // distância do sonar à parede
-	static private int LENGHTMAP = 240; // comprimento máximo do mapa
-	static private int DISCRET_SIZE = 120; // número de células da discretização
+	// static private int LENGHTMAP = 240; // comprimento máximo do mapa
+    static private int LENGHTMAP = 585; // comprimento máximo do mapa
+	// static private int DISCRET_SIZE = 120; // número de células da discretização
+    static private int DISCRET_SIZE = 117; // número de células da discretização
 	
 	public MainProgram(double mapsize, int numbersegments, Robot robot, Map map) {
 		this.robot = robot;
@@ -60,10 +62,9 @@ public class MainProgram extends JPanel implements KeyListener, WindowListener {
 				localização.
 		*/
 
-    // for (int i = 0; i < DISCRET_SIZE; i++)
-    //     bel.add(1.0);
-    // bel.normalize();
-
+    for (int i = 0; i < DISCRET_SIZE; i++)
+        bel.add(1.0);
+    bel.normalize();
 
 		printHistogram ();
 	}
@@ -74,8 +75,8 @@ public class MainProgram extends JPanel implements KeyListener, WindowListener {
 		*/
 		printHistogram ();
 	}
-	
-	void prediction (double delta) {
+
+  void prediction (double delta) {
 		/*
 			Insira o código de predição da crença do robô dado um deslocamento 'delta'
 		*/
@@ -83,21 +84,22 @@ public class MainProgram extends JPanel implements KeyListener, WindowListener {
       DiscreteSpace tmp = new DiscreteSpace();
 
       for (int i = 0; i < DISCRET_SIZE; i++)
-          tmp.add(1.0);
+          tmp.add(0.0);
 
       for (int i = 0; i < DISCRET_SIZE; i++) {
           for (int j = 0; j < DISCRET_SIZE; j++) {
               double dist = (j - i) * SIZE;
-              double action_model = pdf(i*SIZE + dist, dist, 0.1*dist);
+              double action_model = pdf(dist, delta, 0.5*delta);
               //bel[i] = bel.get(i)*action_model;
-              tmp.set(i, tmp.get(i) + bel.get(j)*action_model);
+              tmp.set(j, tmp.get(j) + bel.get(i)*action_model);
           }
       }
 
       for (int i = 0; i < DISCRET_SIZE; i++)
           bel.set(i, tmp.get(i));
 
-		printHistogram ();
+      bel.normalize();
+      printHistogram ();
 	}
 	
     public static double pdf(double x) {
@@ -207,17 +209,37 @@ public class MainProgram extends JPanel implements KeyListener, WindowListener {
 
 	public static void main(String[] args) {
 		Map map  = new Map();
+
+    // Valores mapa completo
+
+    //     Tamanho total do mapa: 585 cm
+
+    //                          Obs: caixas ordenadas da esquerda para a direita
+
+    //                          Caixas  ->  Distância da origem (inícioCaixa, fimCaixa)
+    //                          (1) -> (20, 50)
+    //                          (2) -> (101, 131)
+    //                          (3) -> (212, 242)
+    //                          (4) -> (346, 376)
+    //                          (5) -> (422, 452)
+    //                          (6) -> (526, 556)
 		/*
 		Edite o código, para adicionar as dimensões das caixas do mapa e renomear o brick
 
-		Exemplo: 
+		Exemplo:
 			map.add(84,110); // adiciona uma caixa que inicia que ocupa a posição no eixo-x de 84 a 110 cm
-	
 		*/
-		
+
 		// Robot robot =  new Robot("NXT15"); // altere para o nome do brick
 		// if (robot.connect() == false) return;
-		
+
+    map.add(20,50);
+    map.add(101,131);
+    map.add(212,242);
+    map.add(346,376);
+    map.add(422,452);
+    map.add(526,556);
+
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				MainProgram m = new MainProgram(LENGHTMAP, DISCRET_SIZE, null, map);
