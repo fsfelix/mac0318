@@ -9,6 +9,19 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import java.util.Date;
+import java.io.File;
+import java.text.SimpleDateFormat;
+
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import javax.imageio.*;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
+import java.util.Random;
+
 public class MainProgram extends JPanel implements KeyListener, WindowListener {
 	Histogram hist;
 	Robot robot;
@@ -17,6 +30,8 @@ public class MainProgram extends JPanel implements KeyListener, WindowListener {
 	int numbersegments;
 	
 	private DiscreteSpace bel;
+
+	JFrame frame;
 	
 	/*
 	Edite as variáveis, modificando com os valores específicos do mapa
@@ -34,7 +49,7 @@ public class MainProgram extends JPanel implements KeyListener, WindowListener {
 		min = 0;
 		this.map = map;
 		this.numbersegments = numbersegments;
-		JFrame frame = new JFrame("Mapa MAC0318");
+		frame = new JFrame("Mapa MAC0318");
 
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLayout(new BorderLayout());
@@ -61,11 +76,21 @@ public class MainProgram extends JPanel implements KeyListener, WindowListener {
 				Uma distribuição uniforme considerando todas as células possíveis, indica que o robô não tem uma predição inicial de sua
 				localização.
 		*/
+    int SIZE = LENGHTMAP/DISCRET_SIZE;
 
+    // PROB UNIFORME
+    // for (int i = 0; i < DISCRET_SIZE; i++)
+    //     bel.add(1.0);
+
+    // PROB GAUSS CAIXA 2
+    // for (int i = 0; i < DISCRET_SIZE; i++)
+    //     bel.add(pdf(i*SIZE, 116, 40));
+
+    // PROB GAUS CAIXA 4
     for (int i = 0; i < DISCRET_SIZE; i++)
-        bel.add(1.0);
-    bel.normalize();
+        bel.add(pdf(i*SIZE, 361, 40));
 
+    bel.normalize();
 		printHistogram ();
 	}
 
@@ -79,29 +104,31 @@ public class MainProgram extends JPanel implements KeyListener, WindowListener {
       //     System.out.println(this.map.data[i]);
       // }
 
-      for (int i = 0; i < DISCRET_SIZE; i++) {
-          boolean CAIXA = false;
-          for(Double [] inter : this.map.data) {
-              // System.out.println(inter[0] + " " + inter[1]);
-              double init = inter[0]/SIZE;
-              double end = inter[1]/SIZE;
-              // System.out.println(init);
-              // System.out.println(end);
-              if (i >= init && i <= end) {
-                  System.out.println("CAIXA");
-                  CAIXA = true;
-                  break;
+      System.out.println(bel.max());
+      if (bel.max() < 0.5) {
+          for (int i = 0; i < DISCRET_SIZE; i++) {
+              boolean CAIXA = false;
+              for(Double [] inter : this.map.data) {
+
+                  double init = Math.floor(inter[0]/SIZE);
+                  double end = Math.floor(inter[1]/SIZE);
+
+                  if (i >= init && i <= end) {
+                      System.out.println("CAIXA");
+                      CAIXA = true;
+                      break;
+                  }
               }
-          }
 
-          if (CAIXA) {
-              double new_p = pdf(distance, WALL_DISTANCE - BOX_DEPTH, 1.87);
-              bel.set(i, bel.get(i)*new_p);
-          }
+              if (CAIXA) {
+                  double new_p = pdf(distance, WALL_DISTANCE - BOX_DEPTH, 1.87);
+                  bel.set(i, bel.get(i)*new_p);
+              }
 
-          else {
-              double new_p = pdf(distance, WALL_DISTANCE, 1.87);
-              bel.set(i, bel.get(i)*new_p);
+              else {
+                  double new_p = pdf(distance, WALL_DISTANCE, 1.87);
+                  bel.set(i, bel.get(i)*new_p);
+              }
           }
       }
 
@@ -134,7 +161,17 @@ public class MainProgram extends JPanel implements KeyListener, WindowListener {
       bel.normalize();
       printHistogram ();
 	}
-	
+
+    public static int getRandomNumberInRange(int min, int max) {
+
+        if (min >= max) {
+            throw new IllegalArgumentException("max must be greater than min");
+        }
+
+        Random r = new Random();
+        return r.nextInt((max - min) + 1) + min;
+    }
+
     public static double pdf(double x) {
         return Math.exp(-x*x / 2) / Math.sqrt(2 * Math.PI); // return pdf(x) = standard Gaussian pdf
     }
@@ -174,6 +211,20 @@ public class MainProgram extends JPanel implements KeyListener, WindowListener {
 			robot.move(-10);
 			prediction(-10);
 			break;
+		
+		case KeyEvent.VK_S:
+			try{
+				// String fileName = new SimpleDateFormat().format(new Date());
+	            BufferedImage image = new BufferedImage(800, 400, BufferedImage.TYPE_INT_RGB);
+	            Graphics2D graphics2D = image.createGraphics();
+	            frame.paint(graphics2D);
+	            ImageIO.write(image,"jpeg", new File(getRandomNumberInRange(0, 10000000) + ".jpeg"));
+			}
+	        catch(Exception exception)
+	        {
+	            //code
+	        }
+	       break;
 		}
 	}
 	

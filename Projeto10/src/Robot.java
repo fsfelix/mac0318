@@ -148,7 +148,8 @@ public class Robot {
 	public boolean connect () {
 		System.out.println("Conectando...");
 		try {
-			nxtComm = NXTCommFactory.createNXTComm(NXTCommFactory.BLUETOOTH);
+			// nxtComm = NXTCommFactory.createNXTComm(NXTCommFactory.BLUETOOTH);
+      nxtComm = NXTCommFactory.createNXTComm(NXTCommFactory.USB);
 			NXTInfo[] nxtInfo = nxtComm.search(name); //find brick with NXT_ID by doing a Bluetooth inquiry
 			if (nxtInfo.length == 0) { // failed to find a brick with the ID
 				System.err.println("NO NXT found");

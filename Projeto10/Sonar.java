@@ -7,6 +7,8 @@ import lejos.nxt.SensorPort;
 import lejos.nxt.Sound;
 import lejos.nxt.UltrasonicSensor;
 import lejos.nxt.comm.BTConnection;
+import lejos.nxt.comm.USBConnection;
+import lejos.nxt.comm.USB;
 import lejos.nxt.comm.Bluetooth;
 import lejos.robotics.navigation.DifferentialPilot;
 
@@ -57,8 +59,8 @@ public class Sonar {
 
 	public static void main(String[] args) throws Exception {
 
-		BTConnection btc = Bluetooth.waitForConnection();
-		// USBConnection btc = USB.waitForConnection();
+		// BTConnection btc = Bluetooth.waitForConnection();
+		USBConnection btc = USB.waitForConnection();
 
 		DataInputStream input = btc.openDataInputStream();
 		DataOutputStream output = btc.openDataOutputStream();
