@@ -21,8 +21,8 @@ public class MainProgram extends JPanel implements KeyListener, WindowListener {
 	/*
 	Edite as variáveis, modificando com os valores específicos do mapa
 	*/
-	static private int BOX_DEPTH = 37; // profundidade da caixa
-	static private int WALL_DISTANCE = 80; // distância do sonar à parede
+	static private int BOX_DEPTH = 24; // profundidade da caixa
+	static private int WALL_DISTANCE = 50; // distância do sonar à parede
 	// static private int LENGHTMAP = 240; // comprimento máximo do mapa
     static private int LENGHTMAP = 585; // comprimento máximo do mapa
 	// static private int DISCRET_SIZE = 120; // número de células da discretização
@@ -73,7 +73,40 @@ public class MainProgram extends JPanel implements KeyListener, WindowListener {
 		/*
 			Insira o código de atualização da crença do robô dada uma leitura 'distance' do sonar
 		*/
-		printHistogram ();
+      int SIZE = LENGHTMAP/DISCRET_SIZE;
+      // for (int i = 0; i < this.map.size(); i++) {
+      //     // int x = i * SIZE;
+      //     System.out.println(this.map.data[i]);
+      // }
+
+      for (int i = 0; i < DISCRET_SIZE; i++) {
+          boolean CAIXA = false;
+          for(Double [] inter : this.map.data) {
+              // System.out.println(inter[0] + " " + inter[1]);
+              double init = inter[0]/SIZE;
+              double end = inter[1]/SIZE;
+              // System.out.println(init);
+              // System.out.println(end);
+              if (i >= init && i <= end) {
+                  System.out.println("CAIXA");
+                  CAIXA = true;
+                  break;
+              }
+          }
+
+          if (CAIXA) {
+              double new_p = pdf(distance, WALL_DISTANCE - BOX_DEPTH, 1.87);
+              bel.set(i, bel.get(i)*new_p);
+          }
+
+          else {
+              double new_p = pdf(distance, WALL_DISTANCE, 1.87);
+              bel.set(i, bel.get(i)*new_p);
+          }
+      }
+
+      bel.normalize();
+      printHistogram();
 	}
 
   void prediction (double delta) {
@@ -230,8 +263,8 @@ public class MainProgram extends JPanel implements KeyListener, WindowListener {
 			map.add(84,110); // adiciona uma caixa que inicia que ocupa a posição no eixo-x de 84 a 110 cm
 		*/
 
-		// Robot robot =  new Robot("NXT15"); // altere para o nome do brick
-		// if (robot.connect() == false) return;
+		Robot robot =  new Robot("NXT15"); // altere para o nome do brick
+		if (robot.connect() == false) return;
 
     map.add(20,50);
     map.add(101,131);
@@ -242,9 +275,10 @@ public class MainProgram extends JPanel implements KeyListener, WindowListener {
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				MainProgram m = new MainProgram(LENGHTMAP, DISCRET_SIZE, null, map);
-        //        new MainProgram(LENGHTMAP, DISCRET_SIZE, robot, map);
-        m.prediction(30);
+				// MainProgram m = new MainProgram(LENGHTMAP, DISCRET_SIZE, null, map);
+        new MainProgram(LENGHTMAP, DISCRET_SIZE, robot, map);
+        // m.prediction(30);
+        // m.correction(30);
 			}
 		});
 	}
